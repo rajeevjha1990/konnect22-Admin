@@ -30,7 +30,7 @@ class M_group extends Model
     {
       $this->select('group_id as group_id,group_name as group_name,
       group_volunteer as group_volunteer,group_program as program_id,group_noof_member as group_noof_member,
-      group_epno as ep_no,group_senior_epno as senior_ep_no');
+      group_epno as ep_no,group_senior_epno as senior_ep_no,group.group_start_date as group_start_date');
       $this->where('group_id',$groupId);
       return $this->get()->getRow();
     }

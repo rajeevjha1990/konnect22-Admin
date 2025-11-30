@@ -178,38 +178,97 @@ public function state_districts()
   }
 
 public function saintri_distribution()
-  {
-    $saintriData= array(
-        'volunteer_id' =>$this->volunteerData->volntr_id,
-        'member_name' =>$this->request->getVar('member_name'),
-        'age' =>$this->request->getVar('age'),
-        'guardian' =>$this->request->getVar('guardian'),
-        'village' =>$this->request->getVar('village'),
-        'post' =>$this->request->getVar('post'),
-        'police_station' =>$this->request->getVar('police_station'),
-        'district' =>$this->request->getVar('district_id'),
-        'state' =>$this->request->getVar('state_id'),
-        'pincode' =>$this->request->getVar('pincode'),
-        'aadhar' =>$this->request->getVar('aadhar'),
-        'mobile' =>$this->request->getVar('mobile'),
-        'membership_amount' =>$this->request->getVar('membership_amount'),
-        'issue_date' =>date('Y-m-d'),
-    );
-    $m_saintri= new \App\Models\M_saintri_distribution();
-    $result =$m_saintri->saintri_insert($saintriData);
-    if($result){
-      return $this->response->setJSON([
-          'status' => true,
-          'msg' => 'Saitri distribution successfully saved.'
-      ]);
+{
+    $mobile = $this->request->getVar('mobile');
+    $m_saintri = new \App\Models\M_saintri_distribution();
+
+    //  Old active record
+    $oldRecord = $m_saintri->getOldRecord($mobile);
+
+    if ($oldRecord) {
+        $m_saintri->updateOldRecord($oldRecord->id);
     }
-  }
+
+    //  Last paid membership (for yearly check)
+    $lastPaid = $m_saintri->getLastMembershipPaid($mobile);
+
+    $membershipAmount = 0; // default: no charge
+
+    if (!$lastPaid) {
+        //  First time member → full charge
+        $membershipAmount = $this->request->getVar('membership_amount');
+    } else {
+        $lastPaidDate = strtotime($lastPaid->issue_date);
+        $oneYearLater = strtotime('+1 year', $lastPaidDate);
+
+        if (time() >= $oneYearLater) {
+            //  1 saal complete → charge again
+            $membershipAmount = $this->request->getVar('membership_amount');
+        } else {
+            //  1 saal complete nahi hua → FREE renewal
+            $membershipAmount = 0;
+        }
+    }
+
+    //  NEW INSERT DATA
+    $saintriData = [
+        'volunteer_id' => $this->volunteerData->volntr_id,
+        'member_name' => $oldRecord->member_name ?? $this->request->getVar('member_name'),
+        'age' => $oldRecord->age ?? $this->request->getVar('age'),
+        'guardian' => $oldRecord->guardian ?? $this->request->getVar('guardian'),
+        'village' => $oldRecord->village ?? $this->request->getVar('village'),
+        'post' => $oldRecord->post ?? $this->request->getVar('post'),
+        'police_station' => $oldRecord->police_station ?? $this->request->getVar('police_station'),
+        'district' => $oldRecord->district ?? $this->request->getVar('district_id'),
+        'state' => $oldRecord->state ?? $this->request->getVar('state_id'),
+        'pincode' => $oldRecord->pincode ?? $this->request->getVar('pincode'),
+        'aadhar' => $oldRecord->aadhar ?? $this->request->getVar('aadhar'),
+        'mobile' => $mobile,
+
+        //  YEARLY MEMBERSHIP CONTROL
+        'membership_amount' => $membershipAmount,
+
+        'issue_date' => date('Y-m-d'),
+        'status' => 1,
+        'created' => date('Y-m-d H:i:s')
+    ];
+
+    $result = $m_saintri->insert($saintriData);
+
+    if ($result) {
+        return $this->response->setJSON([
+            'status' => true,
+            'msg' => ($membershipAmount > 0)
+                ? 'Membership renewed with payment.'
+                : 'Re-issue successful (No membership charge).'
+        ]);
+    }
+
+    return $this->response->setJSON([
+        'status' => false,
+        'msg' => 'Distribution failed.'
+    ]);
+}
 public function distributed_saintries()
-  {
-    $vlntrId=$this->volunteerData->volntr_id;
-    $m_saintri= new \App\Models\M_saintri_distribution();
-    $response['distributedsaintries']=$m_saintri->distributed_saintries($vlntrId);
-    return json_encode($response);
-  }
+{
+    $vlntrId = $this->volunteerData->volntr_id;
+
+    //Pagination Inputs from App
+    $page  = $this->request->getGet('pageno') ?? 1;
+    $limit = $this->request->getGet('limit') ?? 20;
+
+    $page  = (int)$page;
+    $limit = (int)$limit;
+    $offset = ($page - 1) * $limit;
+
+    $m_saintri = new \App\Models\M_saintri_distribution();
+
+    $data = $m_saintri->distributed_saintries(
+        $vlntrId,
+        $limit,
+        $offset
+    );
+
+return json_encode($data);}
 }
 ?>

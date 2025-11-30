@@ -32,11 +32,36 @@ class M_saintri_distribution extends Model
     {
       return  $this->insert($saintriData);
     }
-  public function distributed_saintries($volntrId)
-    {
-      $this->where('volunteer_id',$volntrId);
-      $this->where('status',1);
-      return $this->get()->getResult();
+  public function getOldRecord($mobile)
+  {
+      $this->where('mobile', $mobile);
+      $this->where('status', 1);
+      return  $this->get()->getRow();
     }
+  public function updateOldRecord($id)
+    {
+        return $this->update($id, [
+            'status' => 0
+        ]);
+    }
+public function getLastMembershipPaid($mobile)
+{
+    return $this->where('mobile', $mobile)
+                ->where('membership_amount >', 0)
+                ->orderBy('issue_date', 'DESC')
+                ->get()
+                ->getRow();
+}
+
+  public function distributed_saintries($volntrId, $limit = 20, $offset = 0)
+{
+    return $this->where('volunteer_id', $volntrId)
+                ->where('status', 1)
+                ->orderBy('id', 'DESC')
+                ->limit($limit, $offset)
+                ->get()
+                ->getResult();
+}
+
 }
 ?>

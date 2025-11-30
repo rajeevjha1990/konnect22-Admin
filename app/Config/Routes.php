@@ -9,6 +9,7 @@ $routes->post('/auth/dologin', 'Admin_auth::dologin');
 $routes->get('/auth/logout', 'Admin_auth::logout');
 $routes->get('/auth/group_edit_requests', 'Admin_auth::group_edit_requests');
 $routes->get('/adminauth/permission_granted/(:num)/(:num)', 'Admin_auth::permission_granted/$1/$2');
+$routes->get('/adminauth/volunteers', 'Admin_auth::volunteers');
 $routes->get('dashboard', 'Dashboard::index');
 
 

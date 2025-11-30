@@ -52,5 +52,10 @@ public function update_profile($profiledata,$vlntrId)
     $this->where('volntr_id',$vlntrId);
     return $this->update();
   }
+public function get_volunteers()
+  {
+      $this->where('volntr_status',1);
+      return $this->get()->getResult();
+  }
 }
 ?>

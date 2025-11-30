@@ -1,0 +1,51 @@
+  .new-btn {
+      display: inline-block;
+      padding: 8px 14px;
+      margin-bottom: 15px;
+      background: #007bff;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 5px;
+      text-decoration: none;
+  }
+
+  .btn-group {
+      background: #17a2b8;
+  }
+  .btn-group:hover {
+      background: #138496;
+  }
+
+  .btn-saintri {
+      background: #28a745;
+  }
+  .btn-saintri:hover {
+      background: #218838;
+  }
+
+  table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+  }
+
+  table th, table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+  }
+
+  table th {
+      background: #f4f4f4;
+  }
+
+  .action-btn {
+      padding: 6px 12px;
+      margin-right: 5px;
+      border-radius: 4px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+  }

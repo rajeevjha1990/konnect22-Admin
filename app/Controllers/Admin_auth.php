@@ -66,7 +66,7 @@ public function group_edit_requests()
     $m_group = new \App\Models\M_group();
     $response = [];
     $result=$m_request->update_request($Id,$groupId);
-  
+
     if ($result){
         $m_group->permission_granted($groupId);
         $response['success'] = true;
@@ -76,6 +76,16 @@ public function group_edit_requests()
     return $this->response
           ->setHeader('Content-Type', 'application/json')
           ->setBody(json_encode($response));
+    }
+  public function volunteers()
+    {
+      $m_volunteer = new \App\Models\M_volunteer();
+      $admindata['admin_name'] = $this->session->get('admin_name');
+      $respdata['volunteers']=$m_volunteer->get_volunteers();
+      echo view('includes/header',$admindata);
+      echo view('includes/sidebar');
+      echo view('volunteers',$respdata);
+      echo view('includes/footer');
     }
 }
 ?>

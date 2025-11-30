@@ -9,17 +9,18 @@ class M_program extends Model
     protected $table = 'programs';
 
     protected $allowedFields = [
-        'program_id',
-        'program_name',
-        'program_description',
-        'program_charge',
-        'program_status',
-        'program_creaed',
+        'id',
+        'icon',
+        'name',
+        'short_desc',
+        'status',
+        'created_at',
+        'updated_at',
     ];
 
   public function get_programs()
     {
-      $this->where('program_status',1);
+      $this->where('status',1);
       return $this->get()->getResult();
     }
 
