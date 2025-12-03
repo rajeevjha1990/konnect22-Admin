@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-public string $baseURL = 'http://localhost/SVJ-API/public/';
+public string $baseURL = 'https://sabkavikasjayti.org/API/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
@@ -199,4 +199,10 @@ public string $baseURL = 'http://localhost/SVJ-API/public/';
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+        public function __construct() {
+        parent::__construct();
+        if (trim($_SERVER['SERVER_NAME']) == "localhost") {
+            $this->baseURL = 'https://localhost/SVJ-API/public/';
+        }
+    }
 }

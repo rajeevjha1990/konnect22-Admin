@@ -32,7 +32,7 @@
                 <td><?= $request->volntr_email ?></td>
                 <td>
                     <!-- Groups Button -->
-                    <a class="action-btn btn-group" href="<?= base_url(); ?>/adminauth/permission_granted/">
+                    <a class="action-btn btn-group" href="<?= base_url(); ?>/adminauth/volunteer_groups/<?php echo $request->volntr_id; ?>">
                         <i class="fa-solid fa-users"></i> Groups
                     </a>
 

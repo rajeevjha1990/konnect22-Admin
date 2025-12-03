@@ -57,5 +57,17 @@ public function get_volunteers()
       $this->where('volntr_status',1);
       return $this->get()->getResult();
   }
+public function checkRegister($mobile)
+  {
+    $this->where('volntr_mobile',$mobile);
+    return $this->get()->getRow();
+  }
+public function clearOtp($consumerId)
+  {
+    $this->set('volntr_otp_code	',null);
+    $this->set('otp_expires_at',null);
+    $this->where('id',$consumerId);
+    return $this->update();
+  }
 }
 ?>

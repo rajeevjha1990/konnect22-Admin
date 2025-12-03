@@ -34,6 +34,7 @@ class M_group extends Model
       $this->where('group_id',$groupId);
       return $this->get()->getRow();
     }
+
   public function insertGroup($groupData)
     {
       return  $this->insert($groupData);
@@ -53,5 +54,6 @@ public function update_group($groupId, $groupData)
     $resp= $this->update();
     return $resp?true:false;
   }
+
 }
 ?>

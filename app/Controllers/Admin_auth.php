@@ -87,5 +87,42 @@ public function group_edit_requests()
       echo view('volunteers',$respdata);
       echo view('includes/footer');
     }
+  public function programs()
+  {
+    $m_program = new \App\Models\M_program();
+    $admindata['admin_name'] = $this->session->get('admin_name');
+    $respdata['programs']=$m_program->get_programs();
+    echo view('includes/header',$admindata);
+    echo view('includes/sidebar');
+    echo view('programs',$respdata);
+    echo view('includes/footer');
+  }
+public function volunteer_groups($volunteerId)
+  {
+
+    $m_volunteer = new \App\Models\M_volunteer();
+    $m_group = new \App\Models\M_group();
+    $admindata['admin_name'] = $this->session->get('admin_name');
+    $respdata['volunteer']=$m_volunteer->get_volunteer($volunteerId);
+    $respdata['groups']=$m_group->get_groups($volunteerId);
+    echo view('includes/header',$admindata);
+    echo view('includes/sidebar');
+    echo view('volunteer_groups',$respdata);
+    echo view('includes/footer');
+  }
+public function group_members($groupId,$volunteerId)
+  {
+    $m_group_member = new \App\Models\M_group_member();
+    $m_group = new \App\Models\M_group();
+    $m_volunteer = new \App\Models\M_volunteer();
+    $admindata['admin_name'] = $this->session->get('admin_name');
+    $respdata['volunteer']=$m_volunteer->get_volunteer($volunteerId);
+    $respdata['group']=$m_group->get_groupdata($groupId);
+    $respdata['groupmembers']=$m_group_member->get_group_members($groupId);
+    echo view('includes/header',$admindata);
+    echo view('includes/sidebar');
+    echo view('group_members',$respdata);
+    echo view('includes/footer');
+  }
 }
 ?>

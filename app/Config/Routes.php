@@ -9,7 +9,10 @@ $routes->post('/auth/dologin', 'Admin_auth::dologin');
 $routes->get('/auth/logout', 'Admin_auth::logout');
 $routes->get('/auth/group_edit_requests', 'Admin_auth::group_edit_requests');
 $routes->get('/adminauth/permission_granted/(:num)/(:num)', 'Admin_auth::permission_granted/$1/$2');
+$routes->get('/adminauth/volunteer_groups/(:num)', 'Admin_auth::volunteer_groups/$1');
+$routes->get('/adminauth/group_members/(:num)/(:num)', 'Admin_auth::group_members/$1/$2');
 $routes->get('/adminauth/volunteers', 'Admin_auth::volunteers');
+$routes->get('/adminauth/programs', 'Admin_auth::programs');
 $routes->get('dashboard', 'Dashboard::index');
 
 
@@ -21,6 +24,7 @@ $routes->group('api/auth', function($routes) {
     $routes->match(['post','options'], 'logout', 'Api\Auth::logout');
     $routes->match(['post','options'], 'update_profile', 'Api\Auth::update_profile');
     $routes->match(['post','options'], 'get_profile', 'Api\Auth::get_profile');
+    $routes->match(['post','options'], 'check_mobile_registered', 'Api\Auth::check_mobile_registered');
 });
 $routes->group('api/common', function($routes) {
     $routes->match(['post','options'], 'qualifications', 'Api\Common::qualifications');

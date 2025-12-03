@@ -7,7 +7,7 @@
                 <i class="fas fa-database"></i> Master Data ▾
         </a>
         <ul class="submenu">
-          <li><a href="<?= base_url(); ?>programs">📋 Programs</a></li>
+          <li><a href="<?= base_url(); ?>adminauth/programs">📋 Programs</a></li>
         </ul>
         </li>
     <li><a href="<?= base_url(); ?>adminauth/volunteers">🤝 Volunteers</a></li>
