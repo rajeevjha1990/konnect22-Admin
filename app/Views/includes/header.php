@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/select2.css">
     <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/admin.css">
 
     <style>
         .header {

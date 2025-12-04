@@ -49,3 +49,21 @@
       align-items: center;
       gap: 6px;
   }
+.btn-edit{
+    background:#28a745;
+    color:#fff;
+}
+
+.btn-delete{
+    background:#dc3545;
+    color:#fff;
+}
+
+.action-btn{
+    padding:6px 10px;
+    border-radius:4px;
+    margin:2px;
+    text-decoration:none;
+    font-size:13px;
+    display:inline-block;
+}

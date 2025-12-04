@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Volunteers</title>
+    <title>Associates</title>
 
     <!-- Font Awesome CDN for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -11,8 +11,10 @@
 </head>
 <body>
 <div class="content">
-    <h2>Volunteers</h2>
-
+    <h2>Associates</h2>
+    <div style="text-align:right;">
+        <a href="<?php echo base_url();?>/adminauth/new_associate" class="new-btn">+ New Associate</a>
+    </div>
     <table id="myTable" class="display" style="width:100%">
         <thead>
             <tr>
@@ -40,6 +42,13 @@
                     <a class="action-btn btn-saintri" href="<?= base_url(); ?>/adminauth/permission_granted/">
                         <i class="fa-solid fa-hand-holding-heart"></i> Saintri Distribution
                     </a>
+                        <a class="action-btn btn-edit" href="<?= base_url(); ?>/adminauth/edit_associate/<?= $request->volntr_id; ?>">
+                  <i class="fa-solid fa-pen"></i> Edit
+              </a>
+              <a class="action-btn btn-delete delete_data"
+                 href="<?= base_url(); ?>/adminauth/delete_associate/<?= $request->volntr_id; ?>">
+                  <i class="fa-solid fa-trash"></i> Delete
+              </a>
                 </td>
             </tr>
         <?php } ?>

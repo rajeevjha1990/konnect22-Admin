@@ -17,7 +17,7 @@ class M_qualification extends Model
         'qualification_created',
         ];
 
-public function get_qualification()
+public function get_qualifications()
   {
     $this->where('qualification_status',1);
     return $this->get()->getResult();

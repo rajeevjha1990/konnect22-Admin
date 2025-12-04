@@ -13,6 +13,10 @@ $routes->get('/adminauth/volunteer_groups/(:num)', 'Admin_auth::volunteer_groups
 $routes->get('/adminauth/group_members/(:num)/(:num)', 'Admin_auth::group_members/$1/$2');
 $routes->get('/adminauth/volunteers', 'Admin_auth::volunteers');
 $routes->get('/adminauth/programs', 'Admin_auth::programs');
+$routes->get('/adminauth/new_associate', 'Admin_auth::new_associate');
+$routes->get('/adminauth/edit_associate/(:num)', 'Admin_auth::edit_associate/$1');
+$routes->get('/adminauth/delete_associate/(:num)', 'Admin_auth::delete_associate/$1');
+$routes->post('/adminauth/save_volunteer', 'Admin_auth::save_volunteer');
 $routes->get('dashboard', 'Dashboard::index');
 
 

@@ -46,7 +46,7 @@ public function insert_volunteer($data)
   {
   return  $this->insert($data);
   }
-public function update_profile($profiledata,$vlntrId)
+public function edit_volunteer($profiledata,$vlntrId)
   {
     $this->set($profiledata);
     $this->where('volntr_id',$vlntrId);
@@ -67,6 +67,12 @@ public function clearOtp($consumerId)
     $this->set('volntr_otp_code	',null);
     $this->set('otp_expires_at',null);
     $this->where('id',$consumerId);
+    return $this->update();
+  }
+public function delete_associate($id)
+  {
+    $this->set('volntr_status',0);
+    $this->where('volntr_id',$id);
     return $this->update();
   }
 }
