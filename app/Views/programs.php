@@ -12,7 +12,9 @@
 <body>
 <div class="content">
     <h2>Programs</h2>
-
+<div style="text-align:right;">
+    <a href="<?php echo base_url();?>/adminauth/new_program" class="new-btn">+ New Program</a>
+</div>
     <table id="myTable" class="display" style="width:100%">
         <thead>
             <tr>
@@ -24,22 +26,19 @@
         </thead>
         <tbody>
         <?php foreach ($programs as $program) {
-
             ?>
             <tr>
                 <td><?php echo $program->name; ?></td>
                 <td><?php echo $program->short_desc; ?></td>
                 <td><?php echo $program->icon; ?></td>
                 <td>
-                    <!-- Groups Button -->
-                    <a class="action-btn btn-group" href="<?= base_url(); ?>/adminauth/volunteer_groups/<?php echo ?>">
-                        <i class="fa-solid fa-users"></i> Groups
-                    </a>
-
-                    <!-- Saintri Distribution Button -->
-                    <a class="action-btn btn-saintri" href="<?= base_url(); ?>/adminauth/permission_granted/">
-                        <i class="fa-solid fa-hand-holding-heart"></i> Saintri Distribution
-                    </a>
+              <a class="action-btn btn-edit" href="<?php echo base_url(); ?>/adminauth/edit_program/<?php echo $program->id; ?>">
+              <i class="fa-solid fa-pen"></i> Edit
+                </a>
+                <a class="action-btn btn-delete delete_data"
+                   href="<?php echo base_url(); ?>/adminauth/delete_program/<?php echo $program->id; ?>">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </a>
                 </td>
             </tr>
         <?php } ?>

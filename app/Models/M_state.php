@@ -20,5 +20,10 @@ class M_state extends Model
       $this->where('state_status',1);
       return $this->get()->getResult();
     }
+  public function state($id)
+    {
+      $this->where('state_id',$id);
+      return $this->get()->getRow();
+    }
 }
 ?>

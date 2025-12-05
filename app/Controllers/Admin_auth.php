@@ -91,7 +91,7 @@ public function group_edit_requests()
       echo view('volunteers',$respdata);
       echo view('includes/footer');
     }
-  public function programs()
+public function programs()
   {
     $m_program = new \App\Models\M_program();
     $admindata['admin_name'] = $this->session->get('admin_name');
@@ -101,9 +101,100 @@ public function group_edit_requests()
     echo view('programs',$respdata);
     echo view('includes/footer');
   }
+public function new_program()
+  {
+    $admindata['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$admindata);
+    echo view('includes/sidebar');
+    echo view('program_form');
+    echo view('includes/footer');
+  }
+public function edit_program($id)
+  {
+    $m_program = new \App\Models\M_program();
+    $admindata['admin_name'] = $this->session->get('admin_name');
+    $programdata['program']=$m_program->get_program($id);
+    echo view('includes/header',$admindata);
+    echo view('includes/sidebar');
+    echo view('program_form',$programdata);
+    echo view('includes/footer');
+  }
+  public function save_program()
+  {
+      $id = $this->request->getPost('id');
+      $rules = [
+          'name'        => 'required',
+          'short_desc'  => 'required',
+          'icon'        => 'required',
+      ];
+
+      $this->validation->setRules($rules, [
+          'name' => [
+              'required' => 'Program name is required.'
+          ],
+          'short_desc' => [
+              'required' => 'Short description is required.'
+          ],
+          'icon' => [
+              'required' => 'Program icon name is required.'
+          ]
+      ]);
+
+      if (!$this->validation->withRequest($this->request)->run()) {
+          return $this->response->setJSON([
+              'status' => false,
+              'err'    => $this->validation->getErrors()
+          ]);
+      }
+      $data = [
+          'icon'       => $this->request->getPost('icon'),
+          'name'       => $this->request->getPost('name'),
+          'short_desc' => $this->request->getPost('short_desc'),
+      ];
+
+      $m_program = new \App\Models\M_program();
+
+      if (!empty($id)) {
+          $resp = $m_program->update_program($data, $id);
+          $msg  = "Program updated successfully";
+      } else {
+          $resp = $m_program->insert_program($data);
+          $msg  = "Program added successfully";
+      }
+
+      if ($resp) {
+          return $this->response->setJSON([
+              "status"   => true,
+              "message"  => $msg,
+              "redirect" => base_url('adminauth/programs')
+          ]);
+      } else {
+          return $this->response->setJSON([
+              "status"  => false,
+              "message" => "Error, try again.."
+          ]);
+      }
+  }
+public function delete_program($id)
+{
+    $m_program = new \App\Models\M_program();
+    $data = $m_program->delete_program($id);
+    $response = [];
+    if ($data === false) {
+        $response['success'] = false;
+        $response['err']     = "Program not removed.";
+    } else {
+        $response['success'] = true;
+        $response['message'] = "Program removed successfully.";
+        $response['reload']  = 1;
+    }
+    return $this->response
+          ->setHeader('Content-Type', 'application/json')
+          ->setBody(json_encode($response));
+        }
+
 public function volunteer_groups($volunteerId)
   {
-
     $m_volunteer = new \App\Models\M_volunteer();
     $m_group = new \App\Models\M_group();
     $admindata['admin_name'] = $this->session->get('admin_name');

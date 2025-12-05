@@ -13,11 +13,22 @@ $routes->get('/adminauth/volunteer_groups/(:num)', 'Admin_auth::volunteer_groups
 $routes->get('/adminauth/group_members/(:num)/(:num)', 'Admin_auth::group_members/$1/$2');
 $routes->get('/adminauth/volunteers', 'Admin_auth::volunteers');
 $routes->get('/adminauth/programs', 'Admin_auth::programs');
+$routes->get('/adminauth/new_program', 'Admin_auth::new_program');
+$routes->get('/adminauth/edit_program/(:num)', 'Admin_auth::edit_program/$1');
 $routes->get('/adminauth/new_associate', 'Admin_auth::new_associate');
 $routes->get('/adminauth/edit_associate/(:num)', 'Admin_auth::edit_associate/$1');
 $routes->get('/adminauth/delete_associate/(:num)', 'Admin_auth::delete_associate/$1');
+$routes->get('/adminauth/delete_program/(:num)', 'Admin_auth::delete_program/$1');
 $routes->post('/adminauth/save_volunteer', 'Admin_auth::save_volunteer');
+$routes->post('/adminauth/save_program', 'Admin_auth::save_program');
 $routes->get('dashboard', 'Dashboard::index');
+$routes->get('/common/states', 'Common::states');
+$routes->get('/common/districts/(:num)', 'Common::districts/$1');
+$routes->get('/common/new_district/(:num)', 'Common::new_district/$1');
+$routes->get('/common/edit_district/(:num)/(:num)', 'Common::edit_district/$1/$2');
+$routes->get('/common/delete_district/(:num)', 'Common::delete_district/$1');
+$routes->post('/common/save_district', 'Common::save_district');
+$routes->get('/common/blocks/(:num)', 'Common::blocks/$1');
 
 
 $routes->group('api/auth', function($routes) {
