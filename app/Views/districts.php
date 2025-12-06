@@ -26,10 +26,12 @@
             </tr>
         </thead>
         <tbody>
-        <?php foreach ($districts as $district) {
+        <?php
+          $i=1;
+         foreach ($districts as $district) {
             ?>
             <tr>
-                <td><?php echo $district->district_id; ?></td>
+                <td><?php echo   $i++; ?></td>
                 <td><?php echo $district->district_name; ?></td>
               <td>
                 <a class="action-btn btn-group" href="<?= base_url(); ?>/common/blocks/<?php echo $district->district_id; ?>">

@@ -21,10 +21,9 @@ class M_block extends Model
       $this->where('block_status',1);
       return $this->get()->getResult();
     }
-  public function get_block($id,$districtId)
+  public function get_block($blockid)
     {
-      $this->where('block_id',$id);
-      $this->where('block_district',$districtId);
+      $this->where('block_id',$blockid);
       return $this->get()->getRow();
     }
   public function insert_block($data)

@@ -29,6 +29,15 @@ $routes->get('/common/edit_district/(:num)/(:num)', 'Common::edit_district/$1/$2
 $routes->get('/common/delete_district/(:num)', 'Common::delete_district/$1');
 $routes->post('/common/save_district', 'Common::save_district');
 $routes->get('/common/blocks/(:num)', 'Common::blocks/$1');
+$routes->get('/common/new_block/(:num)', 'Common::new_block/$1');
+$routes->get('/common/edit_block/(:num)/(:num)', 'Common::edit_block/$1/$2');
+$routes->post('/common/save_block', 'Common::save_block');
+$routes->get('/common/delete_block/(:num)', 'Common::delete_block/$1');
+$routes->get('/common/villages/(:num)', 'Common::villages/$1');
+$routes->get('/common/new_village/(:num)', 'Common::new_village/$1');
+$routes->get('/common/edit_village/(:num)/(:num)', 'Common::edit_village/$1/$2');
+$routes->post('/common/save_village', 'Common::save_village');
+$routes->get('/common/delete_village/(:num)', 'Common::delete_village/$1');
 
 
 $routes->group('api/auth', function($routes) {
