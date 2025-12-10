@@ -100,6 +100,7 @@ public function login()
             'errors' => ['required' => 'Password is required.']
         ]
     ]);
+
     if (!$this->validation->withRequest($this->request)->run()) {
         return $this->response->setStatusCode(451)->setJSON([
             'status' => false,
@@ -107,8 +108,9 @@ public function login()
         ]);
     }
 
-    $mobile = $this->request->getVar('mobile');
+    $mobile   = $this->request->getVar('mobile');
     $password = $this->request->getVar('password');
+
     $m_volunteer = new \App\Models\M_volunteer();
     $volunteer = $m_volunteer->getPassword($mobile);
 
@@ -118,19 +120,26 @@ public function login()
             'msg' => 'Mobile number not registered.'
         ]);
     }
+
     $stored_hash = trim($volunteer->volntr_password);
-    if (password_verify($password, $stored_hash)) {
-       $auth = json_encode(["id" => $volunteer->volntr_id]);
-            $authkey = $this->encrypter->encrypt($auth);
-            $response = [
-                "authkey" => bin2hex($authkey),
-                "volntrid" => $volunteer->volntr_id,
-                "message" => "You are sucessfuly logedin",
-                'status' => true,
-            ];
-            return json_encode($response);
+
+    if (!password_verify($password, $stored_hash)) {
+        return $this->response->setStatusCode(403)->setJSON([
+            'status' => false,
+            'msg' => 'Incorrect password.'
+        ]);
     }
 
+    // Generate Auth Key
+    $auth = json_encode(["id" => $volunteer->volntr_id]);
+    $authkey = $this->encrypter->encrypt($auth);
+
+    return $this->response->setJSON([
+        "authkey"  => bin2hex($authkey),
+        "volntrid" => $volunteer->volntr_id,
+        "message"  => "You are Successfully Logged In",
+        'status'   => true,
+    ]);
 }
   public function get_volunteer()
     {

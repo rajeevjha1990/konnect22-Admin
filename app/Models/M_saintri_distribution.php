@@ -53,7 +53,7 @@ public function getLastMembershipPaid($mobile)
                 ->getRow();
 }
 
-  public function distributed_saintries($volntrId, $limit = 20, $offset = 0)
+public function distributed_saintries($volntrId, $limit = 20, $offset = 0)
 {
     return $this->where('volunteer_id', $volntrId)
                 ->where('status', 1)
@@ -62,6 +62,30 @@ public function getLastMembershipPaid($mobile)
                 ->get()
                 ->getResult();
 }
+public function saintri_distribution($volntrId)
+{
+    $builder = $this->db->table('saintri_distribution');
 
+    $builder->select('saintri_distribution.*, d.district_name');
+    $builder->join('district d', 'd.district_id = saintri_distribution.district', 'left');
+    $builder->where('saintri_distribution.volunteer_id', $volntrId);
+    $builder->where('saintri_distribution.status', 1);
+    $builder->orderBy('saintri_distribution.id', 'DESC');
+
+    $query = $builder->get();
+    if (!$query) {
+        die;
+    }
+
+    return $query->getResult();
+}
+public function today_distributed_saintri($vlntrId)
+{
+    $today = date('Y-m-d');
+    return $this->where('volunteer_id', $vlntrId)
+                ->where('issue_date', $today)
+                ->get()
+                ->getResult();
+  }
 }
 ?>

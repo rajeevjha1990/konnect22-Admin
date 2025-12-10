@@ -186,3 +186,23 @@ body {
         margin-left: 200px;
     }
 }
+.back-btn {
+    background: #444;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-right: 10px;
+    display: inline-block;
+}
+.back-btn i {
+    margin-right: 5px;
+}
+
+.top-actions{
+    text-align: right;
+    margin-bottom: 15px;
+}
+.top-actions a{
+    margin-left: 5px;
+}

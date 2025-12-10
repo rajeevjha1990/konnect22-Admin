@@ -82,15 +82,34 @@ public function group_edit_requests()
           ->setBody(json_encode($response));
     }
   public function volunteers()
-    {
-      $m_volunteer = new \App\Models\M_volunteer();
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      $respdata['volunteers']=$m_volunteer->get_volunteers();
-      echo view('includes/header',$admindata);
-      echo view('includes/sidebar');
-      echo view('volunteers',$respdata);
-      echo view('includes/footer');
+{
+    $m_volunteer = new \App\Models\M_volunteer();
+    $m_group = new \App\Models\M_group();
+    $m_saintri_distribution = new \App\Models\M_saintri_distribution();
+
+    $admindata['admin_name'] = $this->session->get('admin_name');
+
+    $volunteers = $m_volunteer->get_volunteers();
+
+    // Loop through volunteers and add flags
+    foreach ($volunteers as $key => $value) {
+        // Check if volunteer has any groups
+        $vlngroup = $m_group->today_created_group($value->volntr_id);
+        $volunteers[$key]->has_group = !empty($vlngroup);
+
+        // Check if volunteer has any Saintri distributed
+        $vlnsaintridistributed = $m_saintri_distribution->today_distributed_saintri($value->volntr_id);
+        $volunteers[$key]->has_saintri = !empty($vlnsaintridistributed);
     }
+
+    $respdata['volunteers'] = $volunteers;
+
+    echo view('includes/header', $admindata);
+    echo view('includes/sidebar');
+    echo view('volunteers', $respdata);
+    echo view('includes/footer');
+}
+
 public function programs()
   {
     $m_program = new \App\Models\M_program();
@@ -205,6 +224,19 @@ public function volunteer_groups($volunteerId)
     echo view('volunteer_groups',$respdata);
     echo view('includes/footer');
   }
+public function saintri_distribution($volunteerId)
+  {
+    $m_volunteer = new \App\Models\M_volunteer();
+    $m_saintri_distribution = new \App\Models\M_saintri_distribution();
+    $admindata['admin_name'] = $this->session->get('admin_name');
+    $respdata['volunteer']=$m_volunteer->get_volunteer($volunteerId);
+    $respdata['saintridistributions']=$m_saintri_distribution->saintri_distribution($volunteerId);
+
+    echo view('includes/header',$admindata);
+    echo view('includes/sidebar');
+    echo view('saintridistributions',$respdata);
+    echo view('includes/footer');
+  }
 public function group_members($groupId,$volunteerId)
   {
     $m_group_member = new \App\Models\M_group_member();
@@ -233,6 +265,7 @@ public function new_associate()
 public function save_volunteer()
 {
     $id = $this->request->getPost('id');
+    // VALIDATION RULES
     $rules = [
         'volntr_ep_temp'   => 'required',
         'volntr_name'      => 'required',
@@ -241,16 +274,13 @@ public function save_volunteer()
         'volntr_join_date' => 'required',
     ];
 
-    if (empty($id)) {
-        $rules['volntr_password'] = 'required|min_length[6]';
-    }
-
+    // CUSTOM ERROR MESSAGES
     $this->validation->setRules($rules, [
         'volntr_ep_temp' => ['required' => 'Temp EP Number is required.'],
         'volntr_name' => ['required' => 'Full name is required.'],
         'volntr_mobile' => [
-            'required' => 'Mobile number is required.',
-            'numeric' => 'Mobile number must contain only digits.',
+            'required'     => 'Mobile number is required.',
+            'numeric'      => 'Mobile number must contain only digits.',
             'exact_length' => 'Mobile number must be exactly 10 digits.'
         ],
         'volntr_email' => [
@@ -258,39 +288,40 @@ public function save_volunteer()
         ],
         'volntr_join_date' => [
             'required' => 'Joining date is required.'
-        ],
-        'volntr_password' => [
-            'required' => 'Password is required.',
-            'min_length' => 'Password must be at least 6 characters long.'
         ]
     ]);
 
+    // VALIDATION FAILED
     if (!$this->validation->withRequest($this->request)->run()) {
         return $this->response->setJSON([
             'status' => false,
-            'err' => $this->validation->getErrors()
+            'err'    => $this->validation->getErrors()
         ]);
     }
+
+    // COLLECT FORM DATA
     $data = [
-        'volntr_ep_temp'        => $this->request->getPost('volntr_ep_temp'),
-        'volntr_name'           => $this->request->getPost('volntr_name'),
+        'volntr_ep_temp'       => $this->request->getPost('volntr_ep_temp'),
+        'volntr_name'          => $this->request->getPost('volntr_name'),
         'volntr_qualification' => $this->request->getPost('volntr_qualification'),
-        'volntr_mobile'         => $this->request->getPost('volntr_mobile'),
-        'volntr_email'          => $this->request->getPost('volntr_email'),
-        'volntr_address'        => $this->request->getPost('volntr_address'),
-        'volntr_pincode'        => $this->request->getPost('volntr_pincode'),
-        'volntr_join_date'      => $this->request->getPost('volntr_join_date'),
+        'volntr_mobile'        => $this->request->getPost('volntr_mobile'),
+        'volntr_email'         => $this->request->getPost('volntr_email'),
+        'volntr_address'       => $this->request->getPost('volntr_address'),
+        'volntr_pincode'       => $this->request->getPost('volntr_pincode'),
+        'volntr_join_date'     => $this->request->getPost('volntr_join_date'),
     ];
 
+    // CREATE PASSWORD ONLY FOR NEW REGISTRATION
     if (empty($id)) {
         $data['volntr_password'] = password_hash(
-            $this->request->getPost('volntr_password'),
+            $this->request->getPost('volntr_mobile'),
             PASSWORD_DEFAULT
         );
     }
-
+    // MODEL
     $m_volunteer = new \App\Models\M_volunteer();
 
+    // CHECK ALREADY REGISTERED MOBILE FOR NEW ENTRY
     if (empty($id)) {
         $exists = $m_volunteer->volunteer_exits($data['volntr_mobile']);
         if ($exists) {
@@ -301,23 +332,25 @@ public function save_volunteer()
         }
     }
 
+    // INSERT OR UPDATE
     if (!empty($id)) {
         $resp = $m_volunteer->edit_volunteer($data, $id);
-        $msg = "Associate updated successfully";
+        $msg  = "Associate updated successfully";
     } else {
         $resp = $m_volunteer->insert_volunteer($data);
-        $msg = "Associate added successfully";
+        $msg  = "Associate added successfully";
     }
 
+    // FINAL RESPONSE
     if ($resp) {
         return $this->response->setJSON([
-            "status"  => true,
-            "message" => $msg,
+            "status"   => true,
+            "message"  => $msg,
             "redirect" => base_url('adminauth/volunteers')
         ]);
     } else {
         return $this->response->setJSON([
-            "status" => false,
+            "status"  => false,
             "message" => "Error, try again.."
         ]);
     }

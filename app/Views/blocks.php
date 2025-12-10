@@ -15,6 +15,9 @@
   <small style="color:#555;">Blocks</small>
 </h2>
 <div style="text-align:right;">
+  <a href="javascript:history.back()" class="back-btn">
+      <i class="fa-solid fa-arrow-left"></i> Back
+  </a>
     <a href="<?php echo base_url();?>/common/new_block/<?php echo $district->district_id; ?>" class="new-btn">+ New Block</a>
 </div>
     <table id="myTable" class="display" style="width:100%">

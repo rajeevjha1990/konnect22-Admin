@@ -54,6 +54,14 @@ public function update_group($groupId, $groupData)
     $resp= $this->update();
     return $resp?true:false;
   }
+public function today_created_group($vlntrId)
+{
+    $today = date('Y-m-d');
+    return $this->where('group_volunteer', $vlntrId)
+                ->where('group_start_date', $today)
+                ->get()
+                ->getResult();
+  }
 
 }
 ?>

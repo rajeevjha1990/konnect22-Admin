@@ -10,6 +10,7 @@ $routes->get('/auth/logout', 'Admin_auth::logout');
 $routes->get('/auth/group_edit_requests', 'Admin_auth::group_edit_requests');
 $routes->get('/adminauth/permission_granted/(:num)/(:num)', 'Admin_auth::permission_granted/$1/$2');
 $routes->get('/adminauth/volunteer_groups/(:num)', 'Admin_auth::volunteer_groups/$1');
+$routes->get('/adminauth/saintri_distribution/(:num)', 'Admin_auth::saintri_distribution/$1');
 $routes->get('/adminauth/group_members/(:num)/(:num)', 'Admin_auth::group_members/$1/$2');
 $routes->get('/adminauth/volunteers', 'Admin_auth::volunteers');
 $routes->get('/adminauth/programs', 'Admin_auth::programs');
@@ -38,6 +39,7 @@ $routes->get('/common/new_village/(:num)', 'Common::new_village/$1');
 $routes->get('/common/edit_village/(:num)/(:num)', 'Common::edit_village/$1/$2');
 $routes->post('/common/save_village', 'Common::save_village');
 $routes->get('/common/delete_village/(:num)', 'Common::delete_village/$1');
+$routes->get('/common/associate_details/(:num)', 'Common::associate_details/$1');
 
 
 $routes->group('api/auth', function($routes) {
@@ -64,5 +66,7 @@ $routes->group('api/common', function($routes) {
     $routes->match(['post','options'], 'state_districts', 'Api\Common::state_districts');
     $routes->match(['post','options'], 'saintri_distribution', 'Api\Common::saintri_distribution');
     $routes->match(['post','options'], 'distributed_saintries', 'Api\Common::distributed_saintries');
+    $routes->match(['post','options'], 'district_blocks', 'Api\Common::district_blocks');
+    $routes->match(['post','options'], 'block_villages', 'Api\Common::block_villages');
 
 });

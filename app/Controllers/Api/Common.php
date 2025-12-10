@@ -34,6 +34,21 @@ public function epGropus()
     $response['groups']=$m_group->get_groups($vlntrId);
     return json_encode($response);
   }
+  public function getProgramsAndGroups()
+{
+    $m_program = new \App\Models\M_program();
+    $m_group   = new \App\Models\M_group();
+
+    $vlntrId = $this->volunteerData->volntr_id;
+
+    $response = [
+        'programs' => $m_program->get_programs(),
+        'groups'   => $m_group->get_groups($vlntrId)
+    ];
+
+    return json_encode($response);
+}
+
 public function new_group()
 {
     $groupId = $this->request->getVar('group_id');
@@ -176,6 +191,21 @@ public function state_districts()
   $response['districts']=$m_district->state_districts($stateId);
   return json_encode($response);
   }
+public function district_blocks()
+  {
+  $districtId=$this->request->getVar('districtId');
+  $m_block= new \App\Models\M_block();
+  $response['blocks']=$m_block->district_blocks($districtId);
+  return json_encode($response);
+  }
+
+public function block_villages()
+  {
+  $blockId=$this->request->getVar('blockId');
+  $m_village= new \App\Models\M_village();
+  $response['villages']=$m_village->block_villages($blockId);
+  return json_encode($response);
+  }
 
 public function saintri_distribution()
 {
@@ -217,12 +247,10 @@ public function saintri_distribution()
         'age' => $oldRecord->age ?? $this->request->getVar('age'),
         'guardian' => $oldRecord->guardian ?? $this->request->getVar('guardian'),
         'village' => $oldRecord->village ?? $this->request->getVar('village'),
-        'post' => $oldRecord->post ?? $this->request->getVar('post'),
-        'police_station' => $oldRecord->police_station ?? $this->request->getVar('police_station'),
+        'post' => $oldRecord->post ?? $this->request->getVar('block_id'),
         'district' => $oldRecord->district ?? $this->request->getVar('district_id'),
         'state' => $oldRecord->state ?? $this->request->getVar('state_id'),
         'pincode' => $oldRecord->pincode ?? $this->request->getVar('pincode'),
-        'aadhar' => $oldRecord->aadhar ?? $this->request->getVar('aadhar'),
         'mobile' => $mobile,
 
         //  YEARLY MEMBERSHIP CONTROL

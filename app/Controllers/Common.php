@@ -277,6 +277,19 @@ public function villages($blockid)
             ->setHeader('Content-Type', 'application/json')
             ->setBody(json_encode($response));
       }
-
+public function associate_details($vlntrId)
+  {
+    $m_group=new \App\Models\M_group();
+    $m_saintri_distribution=new \App\Models\M_saintri_distribution();
+    $m_volunteer=new \App\Models\M_volunteer();
+    $respdata['groups']=$m_group->get_groups($vlntrId);
+    $respdata['saintridistributions']=$m_saintri_distribution->saintri_distribution($vlntrId);
+    $respdata['volunteerdetails']=$m_volunteer->get_volunteer($vlntrId);
+    $admindata['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$admindata);
+    echo view('includes/sidebar');
+    echo view('associate_details',$respdata);
+    echo view('includes/footer');
+  }
 }
 ?>

@@ -16,7 +16,7 @@
     $volntr_email=$associate->volntr_email;
     $volntr_address=$associate->volntr_address;
     $volntr_pincode=$associate->volntr_pincode;
-    $volntr_password=$associate->volntr_password;
+    // $volntr_password=$associate->volntr_password;
     $volntr_join_date=$associate->volntr_join_date;
   }else{
     $id='';
@@ -27,7 +27,7 @@
     $volntr_email='';
     $volntr_address='';
     $volntr_pincode='';
-    $volntr_password='';
+    // $volntr_password='';
     $volntr_join_date='';
   }
 ?>
@@ -87,7 +87,7 @@
       </div>
 
       <!-- Password (ONLY FOR NEW) -->
-      <?php if (empty($id)) { ?>
+      <!-- <?php if (empty($id)) { ?>
       <div class="col-md-4">
         <label class="form-label">Password</label>
         <input type="password" name="volntr_password" class="form-control" required>
@@ -97,17 +97,17 @@
         <label class="form-label">Password</label>
         <input type="password" class="form-control" disabled value="********">
       </div>
-      <?php } ?>
+      <?php } ?> -->
 
       <!-- Pincode -->
-      <div class="col-md-6">
+      <div class="col-md-4">
         <label class="form-label">Pincode</label>
         <input type="text" name="volntr_pincode" value="<?= $volntr_pincode ?>"
                class="form-control" maxlength="6">
       </div>
 
       <!-- Join Date -->
-      <div class="col-md-6">
+      <div class="col-md-12">
         <label class="form-label">Joining Date</label>
         <input type="date" name="volntr_join_date"
                value="<?= $volntr_join_date ?>" class="form-control" required>
