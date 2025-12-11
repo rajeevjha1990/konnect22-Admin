@@ -291,5 +291,23 @@ public function associate_details($vlntrId)
     echo view('associate_details',$respdata);
     echo view('includes/footer');
   }
+public function filter_associate_data()
+{
+    $from = $this->request->getPost('from_date');
+    $to = $this->request->getPost('to_date');
+    $volunteer = $this->request->getPost('associate_id');
+    
+  $m_group=new \App\Models\M_group();
+  $m_saintri_distribution=new \App\Models\M_saintri_distribution();
+
+    $groups = $m_group->filterGroups($volunteer, $from, $to);
+    $saintri = $m_saintri_distribution->filterSaintri($volunteer, $from, $to);
+
+    return json_encode([
+        "groups" => $groups,
+        "saintri" => $saintri
+    ]);
+}
+
 }
 ?>

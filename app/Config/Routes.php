@@ -40,6 +40,7 @@ $routes->get('/common/edit_village/(:num)/(:num)', 'Common::edit_village/$1/$2')
 $routes->post('/common/save_village', 'Common::save_village');
 $routes->get('/common/delete_village/(:num)', 'Common::delete_village/$1');
 $routes->get('/common/associate_details/(:num)', 'Common::associate_details/$1');
+$routes->post('/common/filter_associate_data', 'Common::filter_associate_data');
 
 
 $routes->group('api/auth', function($routes) {
@@ -68,5 +69,8 @@ $routes->group('api/common', function($routes) {
     $routes->match(['post','options'], 'distributed_saintries', 'Api\Common::distributed_saintries');
     $routes->match(['post','options'], 'district_blocks', 'Api\Common::district_blocks');
     $routes->match(['post','options'], 'block_villages', 'Api\Common::block_villages');
+    $routes->match(['post','options'], 'get_allsainetriCount', 'Api\Common::get_allsainetriCount');
+    $routes->match(['post','options'], 'get_allGroupCount', 'Api\Common::get_allGroupCount');
+    $routes->match(['post','options'], 'getProgramsAndGroups', 'Api\Common::getProgramsAndGroups');
 
 });

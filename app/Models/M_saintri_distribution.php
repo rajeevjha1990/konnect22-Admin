@@ -87,5 +87,24 @@ public function today_distributed_saintri($vlntrId)
                 ->get()
                 ->getResult();
   }
+public function get_allsainetriCount($volunteer_id)
+{
+    return $this->builder()
+        ->where('volunteer_id', $volunteer_id)
+        ->countAllResults();
+}
+
+public function filterSaintri($id, $from, $to) {
+    return $this
+        ->select('saintri_distribution.*, d.district_name')
+        ->join('district d', 'd.district_id = saintri_distribution.district', 'left')
+        ->where('volunteer_id', $id)
+        ->where('status', 1)
+        ->where('DATE(issue_date) >=', $from)
+        ->where('DATE(issue_date) <=', $to)
+        ->get()
+        ->getResult();
+}
+
 }
 ?>

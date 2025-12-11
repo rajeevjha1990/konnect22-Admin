@@ -34,18 +34,15 @@ public function epGropus()
     $response['groups']=$m_group->get_groups($vlntrId);
     return json_encode($response);
   }
-  public function getProgramsAndGroups()
-{
+public function getProgramsAndGroups()
+  {
     $m_program = new \App\Models\M_program();
     $m_group   = new \App\Models\M_group();
-
     $vlntrId = $this->volunteerData->volntr_id;
-
     $response = [
         'programs' => $m_program->get_programs(),
         'groups'   => $m_group->get_groups($vlntrId)
     ];
-
     return json_encode($response);
 }
 
@@ -207,6 +204,7 @@ public function block_villages()
   return json_encode($response);
   }
 
+
 public function saintri_distribution()
 {
     $mobile = $this->request->getVar('mobile');
@@ -297,6 +295,21 @@ public function distributed_saintries()
         $offset
     );
 
-return json_encode($data);}
+      return json_encode($data);
+    }
+  public function get_allsainetriCount()
+    {
+      $vlntrId = $this->volunteerData->volntr_id;
+      $m_saintri = new \App\Models\M_saintri_distribution();
+      $response['countsaintri']=$m_saintri->get_allsainetriCount($vlntrId);
+      return json_encode($response);
+    }
+  public function get_allGroupCount()
+    {
+      $vlntrId = $this->volunteerData->volntr_id;
+      $m_group = new \App\Models\M_group();
+      $response['countgroup']=$m_group->get_allGroupCount($vlntrId);
+      return json_encode($response);
+    }
 }
 ?>

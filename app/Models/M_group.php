@@ -62,6 +62,20 @@ public function today_created_group($vlntrId)
                 ->get()
                 ->getResult();
   }
+public function get_allGroupCount($volunteer_id)
+{
+    return $this->builder()
+        ->where('group_volunteer', $volunteer_id)
+        ->countAllResults();
+}
+    public function filterGroups($id,$from, $to)
+    {
+      return $this->where('group_volunteer', $id)
+                    ->where('group_start_date >=', $from)
+                    ->where('group_start_date <=', $to)
+                    ->findAll();
+    }
+
 
 }
 ?>
