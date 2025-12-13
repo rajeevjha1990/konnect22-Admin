@@ -155,44 +155,50 @@ public function login()
         ]);
     }
 
-    public function reset_password()
-    {
-        $this->validation->setRules([
-            'volntr_mobile'       => 'required|numeric|min_length[10]',
-            'new_password'    => 'required|min_length[6]',
-            'confirm_password' => 'required|matches[new_password]'
-        ]);
+public function reset_password()
+{
+    $this->validation->setRules([
+        'mobileno'       => 'required|numeric|min_length[10]',
+        'new_password'    => 'required|min_length[6]',
+        'confirm_password' => 'required|matches[new_password]'
+    ]);
 
-        if (!$this->validation->withRequest($this->request)->run()) {
-            return $this->response->setStatusCode(400)->setJSON([
-                'status' => false,
-                'errors' => $this->validation->getErrors()
-            ]);
-        }
-
-        $mobile = $this->request->getVar('volntr_mobile');
-        $newPassword = $this->request->getVar('new_password');
-
-        $volunteerModel = new \App\Models\M_volunteer();
-        $volunteer = $volunteerModel->where('volntr_mobile', $mobile)->first();
-
-        if (!$volunteer) {
-            return $this->response->setStatusCode(404)->setJSON([
-                'status' => false,
-                'msg' => 'Mobile number not found.'
-            ]);
-        }
-
-        $volunteerModel->update($volunteer['id'], [
-            'password' => password_hash($newPassword, PASSWORD_DEFAULT),
-            'last_password_changed_at' => date('Y-m-d H:i:s')
-        ]);
-
-        return $this->response->setJSON([
-            'status' => true,
-            'msg' => 'Password reset successful.'
+    if (!$this->validation->withRequest($this->request)->run()) {
+        return $this->response->setStatusCode(400)->setJSON([
+            'status' => false,
+            'errors' => $this->validation->getErrors()
         ]);
     }
+
+    $mobile = $this->request->getVar('mobileno');
+    $newPassword = $this->request->getVar('new_password');
+
+    $volunteerModel = new \App\Models\M_volunteer();
+    $volunteer = $volunteerModel->where('volntr_mobile', $mobile)->first();
+    if (!$volunteer) {
+        return $this->response->setStatusCode(404)->setJSON([
+            'status' => false,
+            'msg' => 'Mobile number not found.'
+        ]);
+    }
+
+    $hashPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    $result = $volunteerModel->password_reset($volunteer['volntr_id'], $hashPassword);
+
+    if ($result) {
+        return $this->response->setStatusCode(200)->setJSON([
+            'status' => true,
+            'msg'    => 'Password reset successful.'
+        ]);
+    } else {
+        return $this->response->setStatusCode(500)->setJSON([
+            'status' => false,
+            'msg'    => 'Password not updated!'
+        ]);
+    }
+}
+
 public function get_profile()
   {
     $vlntrId=$this->volunteerData->volntr_id;
@@ -211,6 +217,7 @@ public function get_profile()
           'volntr_join_date'=>$this->request->getVar('volntr_join_date'),
           'volntr_address'=>$this->request->getVar('volntr_address'),
           'volntr_pincode'=>$this->request->getVar('volntr_pincode'),
+          'volntr_image'=>$this->request->getVar('volntr_image'),
       );
       $volunteerModel = new \App\Models\M_volunteer();
       $vlntrId=$this->volunteerData->volntr_id;
@@ -228,39 +235,44 @@ public function get_profile()
       }
     }
 public function check_mobile_registered()
-  {
-    //helper('sms');
+{
     $this->validation->setRule("mobile", "Mobile", "required|regex_match[/^[1-9][0-9]{9}$/]");
     $this->validation->withRequest($this->request);
+
     if (!$this->validation->run()) {
         return $this->response->setStatusCode(451)->setJSON([
+            "status" => false,
             "err" => $this->validation->getErrors()
         ]);
     }
+
     $volunteerModel = new \App\Models\M_volunteer();
-    $mobile=$this->request->getVar('mobile');
+    $mobile = $this->request->getVar('mobile');
     $volunteer = $volunteerModel->checkRegister($mobile);
+
+    // ❌ Not registered
     if (!$volunteer) {
         return $this->response->setStatusCode(403)->setJSON([
-          'err' => 'Mobile number not registered.'
+            'status' => false,
+            'err' => 'Mobile number not registered.'
         ]);
-    }else{
-      $generatedOtp = rand(1000, 9999);
-      $otpExpiry = gmdate('Y-m-d\TH:i:s\Z', strtotime('+2 minutes'));
-      $lastchangepwd=date('Y-m-d H:i:s');
-      $hashotp=password_hash($generatedOtp,PASSWORD_DEFAULT);
-      $resultSetOtp = $volunteerModel->setOtp($volunteer->volntr_id, $hashotp, $otpExpiry,$lastchangepwd);
-      if($resultSetOtp){
-        //sendSMS($mobile, $generatedOtp);
-        return $this->response->setJSON([
-            'status' => 'success',
-            'msg' => 'OTP sent successfully.',
-            'expiryTime' => $otpExpiry,
-            'mobile' => $mobile
-        ]);
-      }
     }
-  }
+
+    // ✔ Registered user — send OTP
+    $generatedOtp = rand(1000, 9999);
+    $otpExpiry = gmdate('Y-m-d\TH:i:s\Z', strtotime('+2 minutes'));
+    $hashotp = password_hash($generatedOtp, PASSWORD_DEFAULT);
+
+    $volunteerModel->setOtp($volunteer->volntr_id, $hashotp, $otpExpiry);
+
+    return $this->response->setJSON([
+        'status' => true,
+        'msg' => 'OTP sent successfully.',
+        'expiryTime' => $otpExpiry,
+        'mobile' => $mobile,
+        'generatedotp' => $generatedOtp
+    ]);
+}
 public function verify_forgot_otp()
 {
     $volunteerModel = new \App\Models\M_volunteer();
@@ -287,7 +299,7 @@ public function verify_forgot_otp()
     ]);
 }
 
-  if (!password_verify($otp, $volunteer->otp_code)) {
+  if (!password_verify($otp, $volunteer->volntr_otp_code)) {
       return $this->response->setStatusCode(403)->setJSON([
           'err' => 'Invalid OTP.'
       ]);
@@ -296,7 +308,6 @@ public function verify_forgot_otp()
     $volunteerModel->clearOtp($volunteer->volntr_id);
     return $this->response->setJSON([
         'msg'     => 'OTP verified successfully.',
-        'login_token' => $resetToken,
         'consumer_id' => $volunteer->volntr_id
     ]);
 }

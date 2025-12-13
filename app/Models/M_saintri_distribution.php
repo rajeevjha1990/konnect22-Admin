@@ -91,6 +91,7 @@ public function get_allsainetriCount($volunteer_id)
 {
     return $this->builder()
         ->where('volunteer_id', $volunteer_id)
+        ->where('status', 1)
         ->countAllResults();
 }
 

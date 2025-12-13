@@ -66,6 +66,7 @@ public function get_allGroupCount($volunteer_id)
 {
     return $this->builder()
         ->where('group_volunteer', $volunteer_id)
+        ->where('group_status', 1)
         ->countAllResults();
 }
     public function filterGroups($id,$from, $to)

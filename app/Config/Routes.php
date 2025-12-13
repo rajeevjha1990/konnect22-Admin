@@ -46,6 +46,9 @@ $routes->post('/common/filter_associate_data', 'Common::filter_associate_data');
 $routes->group('api/auth', function($routes) {
     $routes->match(['post','options'], 'login', 'Api\Auth::login');
     $routes->match(['post','options'], 'volunteer_register', 'Api\Auth::volunteer_register');
+    $routes->match(['post','options'], 'check_mobile_registered', 'Api\Auth::check_mobile_registered');
+    $routes->match(['post','options'], 'verify_forgot_otp', 'Api\Auth::verify_forgot_otp');
+    $routes->match(['post','options'], 'reset_password', 'Api\Auth::reset_password');
     $routes->match(['post','options'], 'get_volunteer', 'Api\Auth::get_volunteer');
     $routes->match(['post','options'], 'get_volunteer', 'Api\Auth::get_volunteer');
     $routes->match(['post','options'], 'logout', 'Api\Auth::logout');
@@ -73,4 +76,7 @@ $routes->group('api/common', function($routes) {
     $routes->match(['post','options'], 'get_allGroupCount', 'Api\Common::get_allGroupCount');
     $routes->match(['post','options'], 'getProgramsAndGroups', 'Api\Common::getProgramsAndGroups');
 
+});
+$routes->group('api/upload', function($routes) {
+    $routes->match(['post','options'], 'upload', 'Api\Upload::upload');
 });

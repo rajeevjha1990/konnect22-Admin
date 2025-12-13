@@ -19,6 +19,9 @@ class M_volunteer extends Model
         'volntr_address',
         'volntr_password',
         'volntr_join_date',
+        'volntr_image',
+        'volntr_otp_code',
+        'otp_expires_at',
         'volntr_status',
         'volntr_created',
     ];
@@ -62,11 +65,19 @@ public function checkRegister($mobile)
     $this->where('volntr_mobile',$mobile);
     return $this->get()->getRow();
   }
-public function clearOtp($consumerId)
+public function setOtp($vlntrId, $otpCode, $expiryTime=false)
+{
+
+  $this->where('volntr_id',$vlntrId);
+  $this->set('volntr_otp_code', $otpCode);
+  $this->set('otp_expires_at',$expiryTime);
+  return $this->update();
+ }
+public function clearOtp($vlntrId)
   {
     $this->set('volntr_otp_code	',null);
     $this->set('otp_expires_at',null);
-    $this->where('id',$consumerId);
+    $this->where('volntr_id',$vlntrId);
     return $this->update();
   }
 public function delete_associate($id)
@@ -75,5 +86,18 @@ public function delete_associate($id)
     $this->where('volntr_id',$id);
     return $this->update();
   }
+  public function update_profile($profiledata,$vlntrId)
+  {
+    $this->set($profiledata);
+    $this->where('volntr_id',$vlntrId);
+    return $this->update();
+  }
+
+  public function password_reset($vlntrId, $password)
+  {
+    $this->where('volntr_id',$vlntrId);
+    $this->set('volntr_password', $password);
+    return $this->update();
+   }
 }
 ?>

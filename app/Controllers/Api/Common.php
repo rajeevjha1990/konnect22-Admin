@@ -18,7 +18,7 @@ class Common extends BaseAuthController
     public function qualifications()
       {
         $m_qualification = new \App\Models\M_qualification();
-        $response['qualifications']=$m_qualification->get_qualification();
+        $response['qualifications']=$m_qualification->get_qualifications();
         return json_encode($response);
       }
 public function getPrograms()
