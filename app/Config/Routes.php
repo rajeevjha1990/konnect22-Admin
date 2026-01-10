@@ -83,3 +83,4 @@ $routes->group('api/upload', function($routes) {
 $routes->group('api/publicApi', function($routes) {
     $routes->match(['post','options'], 'apply_program', 'Api\PublicApi::apply_program');
 });
+
