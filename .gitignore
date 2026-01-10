@@ -1,0 +1,4 @@
+/writable/session/*
+/writable/cache/*
+/writable/logs/*
+/.env
