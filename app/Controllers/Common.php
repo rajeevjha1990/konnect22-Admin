@@ -308,6 +308,39 @@ public function filter_associate_data()
         "saintri" => $saintri
     ]);
 }
-
+ public function sanitry_orders()
+    {
+      $m_program_apply = new \App\Models\M_program_apply();
+      $admindata['admin_name'] = $this->session->get('admin_name');
+      $respdata['orders']=$m_program_apply->get_orders();
+      echo view('includes/header',$admindata);
+      echo view('includes/sidebar',$admindata);
+      echo view('sanitary_orders',$respdata);
+      echo view('includes/footer');
+    }
+    public function order_assigned($pincode)
+    {
+      $m_program_apply = new \App\Models\M_program_apply();
+      $admindata['admin_name'] = $this->session->get('admin_name');
+      $respdata['orders']=$m_program_apply->get_orders();
+      echo view('includes/header',$admindata);
+      echo view('includes/sidebar');
+      echo view('sanitary_orders',$respdata);
+      echo view('includes/footer');
+    }
+ public function change_assign_order($orderId,$pincode,$programid,$associateid = 0)
+  {
+       $m_program_apply = new \App\Models\M_program_apply();
+       $m_program = new \App\Models\M_program();
+       $m_volunteer= new \App\Models\M_volunteer();
+      $admindata['admin_name'] = $this->session->get('admin_name');
+      $respdata['programdetails']=$m_program->get_program($programid);
+      $respdata['associates']=$m_volunteer->get_volunteers();
+      $respdata['assignedorders']=$m_program_apply->assigned_order($orderId,$pincode);
+      echo view('includes/header',$admindata);
+      echo view('includes/sidebar');
+      return view('change_assign_order', $respdata); 
+      echo view('includes/footer');
+  }
 }
 ?>

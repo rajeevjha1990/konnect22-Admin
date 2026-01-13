@@ -15,70 +15,120 @@ class PublicApi extends BaseController
         $this->validation = \Config\Services::validation();
         $this->request    = \Config\Services::request();
     }
-    
 
-public function apply_program()
-{
-    // Agar edit case hai (order_id aaya hai)
-    if ($this->request->getVar('order_id')) {
+    public function apply_program()
+    {
+        // Validation
         $this->validation->setRule('mobile', 'Mobile', 'required');
-    } else {
-        // New apply case me mobile unique hona chahiye
-        $this->validation->setRule(
-            'mobile','Mobile','required' );
-    }
+        $this->validation->setRule('name', 'Name', 'required');
+        $this->validation->setRule('program_id', 'Program', 'required');
+        $this->validation->setRule('payment_mode', 'Payment Method', 'required');
 
-    // Common validations
-    $this->validation->setRule('name', 'Name', 'required');
-    $this->validation->setRule('program_id', 'Program', 'required');
-    $this->validation->setRule('payment_mode', 'Payment Method', 'required');
+        if (!$this->validation->withRequest($this->request)->run()) {
+            return $this->response->setJSON([
+                'status' => false,
+                'errors' => $this->validation->getErrors()
+            ]);
+        }
 
-    $this->validation->withRequest($this->request);
-
-    if (!$this->validation->run()) {
-        $this->response->setStatusCode(451);
-        $response = [
-            'err' => $this->validation->getErrors()
+        // Order Data
+        $applyData = [
+            'program_id'    => $this->request->getVar('program_id'),
+            'order_name'    => $this->request->getVar('name'),
+            'order_number'  => $this->request->getVar('mobile'),
+            'order_pincode' => $this->request->getVar('pincode'),
+            'order_address' => $this->request->getVar('address'),
+            'amount'        => $this->request->getVar('amount'),
+            'payment_mode'  => $this->request->getVar('payment_mode'), 
+            'payment_status'=> $this->request->getVar('payment_status') ?? 'pending',
+            'order_status'  => 'new'
         ];
-        return json_encode($response);
-    }
 
-    // Data array
-    $applyData = [
-        'program_id'    => $this->request->getVar('program_id'),
-        'order_name'          => $this->request->getVar('name'),
-        'order_number'        => $this->request->getVar('mobile'),
-        'order_pincode'         => $this->request->getVar('pincode'),
-        'order_address'         => $this->request->getVar('address'),
-        'amount'         => $this->request->getVar('amount'),
-        'payment_mode'=> $this->request->getVar('payment_mode'), 
-        'payment_status'=> $this->request->getVar('payment_status') ?? 'pending',
-    ];
+        $m_apply = new \App\Models\M_program_apply();
 
-    $m_apply = new \App\Models\M_program_apply();
+        // Insert new order
+        $orderId = $m_apply->insert($applyData, true);
 
-    // Update or Insert
-    if ($this->request->getVar('order_id')) {
-        $id = $this->request->getVar('order_id');
-        $res = $m_apply->update_apply($id, $applyData);
-    } else {
-        $res = $m_apply->insert_apply($applyData);
-    }
+        if (!$orderId) {
+            return $this->response->setJSON([
+                'status' => false,
+                'msg'    => 'Failed to create order'
+            ]);
+        }
 
-    if ($res) {
-        $response = [
+        // 🔥 AUTO ASSIGN
+        $assignedVolunteerId = $this->auto_assign_volunteer($orderId);
+
+        return $this->response->setJSON([
             'status' => true,
             'msg'    => 'Program applied successfully',
-        ];
-        return json_encode($response);
-    } else {
-        $response = [
-            'status' => false,
-            'msg'    => 'Error, try again...'
-        ];
-        return json_encode($response);
+            'order_id' => $orderId,
+            'assigned_volunteer_id' => $assignedVolunteerId
+        ]);
     }
-}
 
+    /**
+     * 🔥 Auto assign volunteer
+     */
+private function auto_assign_volunteer($orderId)
+{
+    $m_volunteer = new \App\Models\M_volunteer();
+    $m_apply     = new \App\Models\M_program_apply();
+
+    // 1️⃣ Get order
+    $order = $m_apply->getOrderById($orderId);
+    if (!$order) return null;
+
+    $orderPincode = $order['order_pincode'];
+
+    // 2️⃣ Get same pincode volunteers
+    $volunteers = $m_volunteer->getVolunteersByPincode($orderPincode);
+    if (empty($volunteers)) return null;
+
+    $selectedVolunteer = null;
+    $minOrders = PHP_INT_MAX;
+    $oldestTime = null;
+
+    foreach ($volunteers as $vol) {
+
+        $orderCount = $m_apply->get_applycounts($vol['volntr_id']);
+        $lastTime   = $vol['last_assigned_at'];
+
+        // 🥇 Never assigned = top priority
+        if (empty($lastTime)) {
+            $selectedVolunteer = $vol['volntr_id'];
+            break;
+        }
+
+        if (
+            $orderCount < $minOrders ||
+            ($orderCount == $minOrders && strtotime($lastTime) < strtotime($oldestTime ?? date('Y-m-d H:i:s')))
+        ) {
+            $minOrders = $orderCount;
+            $oldestTime = $lastTime;
+            $selectedVolunteer = $vol['volntr_id'];
+        }
+    }
+
+    if (!$selectedVolunteer) return null;
+
+    // 3️⃣ Assign order
+    $m_apply->assignVolunteerToOrder($orderId, $selectedVolunteer);
+
+    // 4️⃣ Update volunteer time
+    $m_volunteer->updateLastAssignedTime($selectedVolunteer);
+
+    return $selectedVolunteer;
+}
+public function change_assign_order($orderId,$pincode)
+  {
+       $m_program_apply = new \App\Models\M_program_apply();
+      $admindata['admin_name'] = $this->session->get('admin_name');
+      $respdata['orders']=$m_program_apply->get_orders();
+      echo view('includes/header',$admindata);
+      echo view('includes/sidebar');
+      echo view('sanitary_orders',$respdata);
+      echo view('includes/footer');
+  }
 }
 ?>

@@ -22,6 +22,7 @@ class M_volunteer extends Model
         'volntr_image',
         'volntr_otp_code',
         'otp_expires_at',
+        'last_assigned_at',
         'volntr_status',
         'volntr_created',
     ];
@@ -99,5 +100,20 @@ public function delete_associate($id)
     $this->set('volntr_password', $password);
     return $this->update();
    }
+  public function updateLastAssignedTime($volunteerId)
+{
+    return $this->where('volntr_id', $volunteerId)
+                ->set([
+                    'last_assigned_at' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+}
+public function getVolunteersByPincode($pincode)
+{
+    return $this->where('volntr_status', 1)
+                ->where('volntr_pincode', $pincode)
+                ->findAll();
+}
+
 }
 ?>
