@@ -22,7 +22,7 @@ $('#myTable').DataTable({
     "ordering": true,
 });
 
-// ================= Medicine Form Submit =================
+// =================  Form Submit =================
 $(document).ready(function () {
     // Generic form submit handler
     $(document).on("submit", "form:not([no-jquery])", function (e) {

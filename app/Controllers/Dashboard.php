@@ -7,7 +7,12 @@ class Dashboard extends BaseController
 
     public function __construct()
     {
+
+     $m_program = new \App\Models\M_program();
+
         $this->session = \Config\Services::session();
+       $this->sidebar_programs = $m_program->get_programs();
+
     }
 public function index()
 {
@@ -15,19 +20,14 @@ public function index()
         return redirect()->to('/');
     }
 
-    $data['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header', $data);
-    echo view('includes/sidebar');
-    echo view('dashboard', $data);
+    // Alag se model call karne ki zaroorat nahi hai
+    echo view('includes/header', $this->data);
+    echo view('includes/sidebar', $this->data);
+    echo view('dashboard', $this->data);
     echo view('includes/footer');
+
 }
 
-public function historyData()
-{
-    $model = new \App\Models\M_stock();
-    $data['history'] = $model->get_all_medicines_monthly_history();
-    return $this->response->setJSON($data);
-}
 
 }
 ?>

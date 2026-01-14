@@ -57,11 +57,12 @@ public function group_edit_requests()
       if (!session()->get('logged_in')) {
           return redirect()->to('/');
       }
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    $reqdata['groupeditrequests']=$m_group_edit_request->get_edit_requests();
-      echo view('includes/header',$admindata);
-      echo view('includes/sidebar');
-      echo view('group_edit_requests',$reqdata);
+    $data=$this->data;
+    $data['admin_name'] = $this->session->get('admin_name');
+    $data['groupeditrequests']=$m_group_edit_request->get_edit_requests();
+      echo view('includes/header',$data);
+      echo view('includes/sidebar',$data);
+      echo view('group_edit_requests',$data);
       echo view('includes/footer');
    }
   public function permission_granted($Id,$groupId)
@@ -81,13 +82,14 @@ public function group_edit_requests()
           ->setHeader('Content-Type', 'application/json')
           ->setBody(json_encode($response));
     }
-  public function volunteers()
+public function volunteers()
 {
+    $data=$this->data;
     $m_volunteer = new \App\Models\M_volunteer();
     $m_group = new \App\Models\M_group();
     $m_saintri_distribution = new \App\Models\M_saintri_distribution();
 
-    $admindata['admin_name'] = $this->session->get('admin_name');
+    $data['admin_name'] = $this->session->get('admin_name');
 
     $volunteers = $m_volunteer->get_volunteers();
 
@@ -104,37 +106,40 @@ public function group_edit_requests()
 
     $respdata['volunteers'] = $volunteers;
 
-    echo view('includes/header', $admindata);
-    echo view('includes/sidebar');
+    echo view('includes/header', $data);
+    echo view('includes/sidebar',$data);
     echo view('volunteers', $respdata);
     echo view('includes/footer');
 }
 
 public function programs()
   {
+    $data=$this->data;
     $m_program = new \App\Models\M_program();
-    $admindata['admin_name'] = $this->session->get('admin_name');
+    $data['admin_name'] = $this->session->get('admin_name');
     $respdata['programs']=$m_program->get_programs();
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
     echo view('programs',$respdata);
     echo view('includes/footer');
   }
 public function new_program()
   {
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
+    $data=$this->data;
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
     echo view('program_form');
     echo view('includes/footer');
   }
 public function edit_program($id)
   {
+    $data=$this->data;
     $m_program = new \App\Models\M_program();
-    $admindata['admin_name'] = $this->session->get('admin_name');
+    $data['admin_name'] = $this->session->get('admin_name');
     $programdata['program']=$m_program->get_program($id);
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
     echo view('program_form',$programdata);
     echo view('includes/footer');
   }
@@ -214,50 +219,54 @@ public function delete_program($id)
 
 public function volunteer_groups($volunteerId)
   {
+    $data=$this->data;
     $m_volunteer = new \App\Models\M_volunteer();
     $m_group = new \App\Models\M_group();
-    $admindata['admin_name'] = $this->session->get('admin_name');
+    $data['admin_name'] = $this->session->get('admin_name');
     $respdata['volunteer']=$m_volunteer->get_volunteer($volunteerId);
     $respdata['groups']=$m_group->get_groups($volunteerId);
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
     echo view('volunteer_groups',$respdata);
     echo view('includes/footer');
   }
 public function saintri_distribution($volunteerId)
   {
+    $data=$this->data;
     $m_volunteer = new \App\Models\M_volunteer();
     $m_saintri_distribution = new \App\Models\M_saintri_distribution();
-    $admindata['admin_name'] = $this->session->get('admin_name');
+    $data['admin_name'] = $this->session->get('admin_name');
     $respdata['volunteer']=$m_volunteer->get_volunteer($volunteerId);
     $respdata['saintridistributions']=$m_saintri_distribution->saintri_distribution($volunteerId);
 
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
     echo view('saintridistributions',$respdata);
     echo view('includes/footer');
   }
 public function group_members($groupId,$volunteerId)
   {
+    $data=$this->data;
     $m_group_member = new \App\Models\M_group_member();
     $m_group = new \App\Models\M_group();
     $m_volunteer = new \App\Models\M_volunteer();
-    $admindata['admin_name'] = $this->session->get('admin_name');
+    $data['admin_name'] = $this->session->get('admin_name');
     $respdata['volunteer']=$m_volunteer->get_volunteer($volunteerId);
     $respdata['group']=$m_group->get_groupdata($groupId);
     $respdata['groupmembers']=$m_group_member->get_group_members($groupId);
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
     echo view('group_members',$respdata);
     echo view('includes/footer');
   }
 public function new_associate()
   {
+    $data=$this->data;
     $m_qualification = new \App\Models\M_qualification();
     $respdata['qualifications']=$m_qualification->get_qualifications();
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
     echo view('associate_form',$respdata);
     echo view('includes/footer');
   }
@@ -357,13 +366,14 @@ public function save_volunteer()
 }
 public function edit_associate($id)
   {
+    $data=$this->data;
     $m_qualification = new \App\Models\M_qualification();
     $m_volunteer = new \App\Models\M_volunteer();
     $respdata['qualifications']=$m_qualification->get_qualifications();
     $respdata['associate']=$m_volunteer->get_volunteer($id);
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
     echo view('associate_form',$respdata);
     echo view('includes/footer');
   }

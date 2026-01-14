@@ -37,6 +37,11 @@ public function getPassword($mobile)
       $this->where('volntr_id',$volunteerId);
       return $this->get()->getRow();
     }
+    public function associatesbyPincode($pincode)
+    {
+      $this->where('volntr_pincode',$pincode);
+      return $this->get()->getResult();
+    }
   public function volunteer_exits($mobile, $volunteerId=null)
       {
         $this->where('volntr_mobile', $mobile);

@@ -41,8 +41,9 @@ $routes->post('/common/save_village', 'Common::save_village');
 $routes->get('/common/delete_village/(:num)', 'Common::delete_village/$1');
 $routes->get('/common/associate_details/(:num)', 'Common::associate_details/$1');
 $routes->post('/common/filter_associate_data', 'Common::filter_associate_data');
-$routes->get('/common/sanitry_orders', 'Common::sanitry_orders');
+$routes->get('/common/sanitry_orders/(:num)', 'Common::sanitry_orders/$1');
 $routes->get('/common/change_assign_order/(:num)/(:num)/(:num)/(:num)', 'Common::change_assign_order/$1/$2/$3/$4');
+$routes->post('/common/re_assign_order', 'Common::re_assign_order');
 
 
 $routes->group('api/auth', function($routes) {

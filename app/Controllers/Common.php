@@ -18,52 +18,57 @@ class Common extends BaseController
 
 public function states()
   {
+    $data=$this->data;
     $m_states = new \App\Models\M_state();
-    $respdata['states']=$m_states->allStates();
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
+    $data['states']=$m_states->allStates();
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
     echo view('includes/sidebar');
-    echo view('states',$respdata);
+    echo view('states',$data);
     echo view('includes/footer');
   }
 public function districts($id)
   {
+    $data=$this->data;
     $m_districts = new \App\Models\M_district();
     $m_states = new \App\Models\M_state();
-    $respdata['state']=$m_states->state($id);
-    $respdata['districts']=$m_districts->state_districts($id);
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
-    echo view('districts',$respdata);
+    $data['state']=$m_states->state($id);
+    $data['districts']=$m_districts->state_districts($id);
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('districts',$data);
     echo view('includes/footer');
   }
 
 public function new_district($id)
   {
+    $data=$this->data;
     $m_districts = new \App\Models\M_district();
     $m_states = new \App\Models\M_state();
-    $respdata['state']=$m_states->state($id);
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
-    echo view('district_form',$respdata);
+    $data['state']=$m_states->state($id);
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('district_form',$data);
     echo view('includes/footer');
   }
 public function edit_district($districtid,$stateId)
   {
+    $data=$this->data;
     $m_district = new \App\Models\M_district();
     $m_states = new \App\Models\M_state();
-    $respdata['state']=$m_states->state($stateId);
-    $respdata['district']=$m_district->get_district($districtid,$stateId);
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
-    echo view('district_form',$respdata);
+    $data['state']=$m_states->state($stateId);
+    $data['district']=$m_district->get_district($districtid,$stateId);
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('district_form',$data);
     echo view('includes/footer');
   }
 public function save_district()
 {
+
     $id        = $this->request->getPost('district_id');
     $state_id  = $this->request->getPost('state_id');
     $name      = $this->request->getPost('district_name');
@@ -113,37 +118,40 @@ public function delete_district($id)
 /*Block Function*/
 public function blocks($districtid)
   {
+    $data=$this->data;
     $m_block = new \App\Models\M_block();
     $m_district = new \App\Models\M_district();
-    $respdata['district']=$m_district->get_district($districtid);
-    $respdata['blocks']=$m_block->district_blocks($districtid);
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
-    echo view('blocks',$respdata);
+    $data['district']=$m_district->get_district($districtid);
+    $data['blocks']=$m_block->district_blocks($districtid);
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('blocks',$data);
     echo view('includes/footer');
   }
   public function new_block($districtid)
     {
+      $data=$this->data;
       $m_block = new \App\Models\M_block();
       $m_district = new \App\Models\M_district();
-      $respdata['district']=$m_district->get_district($districtid);
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      echo view('includes/header',$admindata);
-      echo view('includes/sidebar');
-      echo view('block_form',$respdata);
+      $data['district']=$m_district->get_district($districtid);
+      $data['admin_name'] = $this->session->get('admin_name');
+      echo view('includes/header',$data);
+      echo view('includes/sidebar',$data);
+      echo view('block_form',$data);
       echo view('includes/footer');
     }
   public function edit_block($blockid,$districtId)
     {
+      $data=$this->data;
       $m_block = new \App\Models\M_block();
       $m_district = new \App\Models\M_district();
-      $respdata['district']=$m_district->get_district($districtId);
-      $respdata['block']=$m_block->get_block($blockid);
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      echo view('includes/header',$admindata);
-      echo view('includes/sidebar');
-      echo view('block_form',$respdata);
+      $data['district']=$m_district->get_district($districtId);
+      $data['block']=$m_block->get_block($blockid);
+      $data['admin_name'] = $this->session->get('admin_name');
+      echo view('includes/header',$data);
+      echo view('includes/sidebar',$data);
+      echo view('block_form',$data);
       echo view('includes/footer');
     }
   public function save_block()
@@ -197,36 +205,39 @@ public function blocks($districtid)
 /*Village Function*/
 public function villages($blockid)
   {
+    $data=$this->data;
     $m_block = new \App\Models\M_block();
     $m_village = new \App\Models\M_village();
-    $respdata['block']=$m_block->get_block($blockid);
-    $respdata['villages']=$m_village->block_villages($blockid);
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
-    echo view('includes/sidebar');
-    echo view('villages',$respdata);
+    $data['block']=$m_block->get_block($blockid);
+    $data['villages']=$m_village->block_villages($blockid);
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('villages',$data);
     echo view('includes/footer');
   }
   public function new_village($blockid)
     {
       $m_block = new \App\Models\M_block();
-      $respdata['block']=$m_block->get_block($blockid);
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      echo view('includes/header',$admindata);
+      $data=$this->data;
+      $data['block']=$m_block->get_block($blockid);
+      $data['admin_name'] = $this->session->get('admin_name');
+      echo view('includes/header',$data);
       echo view('includes/sidebar');
-      echo view('village_form',$respdata);
+      echo view('village_form',$data);
       echo view('includes/footer');
     }
   public function edit_village($villageId,$blockId)
     {
       $m_block = new \App\Models\M_block();
       $m_village = new \App\Models\M_village();
-      $respdata['block']=$m_block->get_block($blockId);
-      $respdata['village']=$m_village->get_village($villageId);
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      echo view('includes/header',$admindata);
+      $data=$this->data;
+      $data['block']=$m_block->get_block($blockId);
+      $data['village']=$m_village->get_village($villageId);
+      $data['admin_name'] = $this->session->get('admin_name');
+      echo view('includes/header',$data);
       echo view('includes/sidebar');
-      echo view('village_form',$respdata);
+      echo view('village_form',$data);
       echo view('includes/footer');
     }
   public function save_village()
@@ -280,15 +291,16 @@ public function villages($blockid)
 public function associate_details($vlntrId)
   {
     $m_group=new \App\Models\M_group();
+    $data=$this->data;
     $m_saintri_distribution=new \App\Models\M_saintri_distribution();
     $m_volunteer=new \App\Models\M_volunteer();
-    $respdata['groups']=$m_group->get_groups($vlntrId);
-    $respdata['saintridistributions']=$m_saintri_distribution->saintri_distribution($vlntrId);
-    $respdata['volunteerdetails']=$m_volunteer->get_volunteer($vlntrId);
-    $admindata['admin_name'] = $this->session->get('admin_name');
-    echo view('includes/header',$admindata);
+    $data['groups']=$m_group->get_groups($vlntrId);
+    $data['saintridistributions']=$m_saintri_distribution->saintri_distribution($vlntrId);
+    $data['volunteerdetails']=$m_volunteer->get_volunteer($vlntrId);
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
     echo view('includes/sidebar');
-    echo view('associate_details',$respdata);
+    echo view('associate_details',$data);
     echo view('includes/footer');
   }
 public function filter_associate_data()
@@ -308,39 +320,71 @@ public function filter_associate_data()
         "saintri" => $saintri
     ]);
 }
- public function sanitry_orders()
-    {
-      $m_program_apply = new \App\Models\M_program_apply();
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      $respdata['orders']=$m_program_apply->get_orders();
-      echo view('includes/header',$admindata);
-      echo view('includes/sidebar',$admindata);
-      echo view('sanitary_orders',$respdata);
-      echo view('includes/footer');
-    }
+ public function sanitry_orders($programid)
+
+{
+    $data = $this->data; 
+    $m_program_apply = new \App\Models\M_program_apply();
+    $data['orders'] = $m_program_apply->get_orders($programid);
+    echo view('includes/header', $data);
+    echo view('includes/sidebar', $data); 
+    echo view('sanitary_orders', $data);
+    echo view('includes/footer');
+}
+
     public function order_assigned($pincode)
     {
+      $data=$this->data;
       $m_program_apply = new \App\Models\M_program_apply();
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      $respdata['orders']=$m_program_apply->get_orders();
-      echo view('includes/header',$admindata);
+      $data['admin_name'] = $this->session->get('admin_name');
+      $data['orders']=$m_program_apply->get_orders();
+      echo view('includes/header',$data);
       echo view('includes/sidebar');
-      echo view('sanitary_orders',$respdata);
+      echo view('sanitary_orders',$data);
       echo view('includes/footer');
     }
- public function change_assign_order($orderId,$pincode,$programid,$associateid = 0)
-  {
-       $m_program_apply = new \App\Models\M_program_apply();
-       $m_program = new \App\Models\M_program();
-       $m_volunteer= new \App\Models\M_volunteer();
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      $respdata['programdetails']=$m_program->get_program($programid);
-      $respdata['associates']=$m_volunteer->get_volunteers();
-      $respdata['assignedorders']=$m_program_apply->assigned_order($orderId,$pincode);
-      echo view('includes/header',$admindata);
-      echo view('includes/sidebar');
-      return view('change_assign_order', $respdata); 
-      echo view('includes/footer');
-  }
+public function change_assign_order($orderId, $pincode, $programid, $associateid = 0)
+
+{
+    $m_program_apply = new \App\Models\M_program_apply();
+    $m_program = new \App\Models\M_program();
+    $m_volunteer = new \App\Models\M_volunteer();
+    $data=$this->data;
+    $data['admin_name'] = $this->session->get('admin_name');
+    $data['programdetails'] = $m_program->get_program($programid);
+    $data['associates'] = $m_volunteer->associatesbyPincode($pincode);
+    $data['assignedorders'] = $m_program_apply->assigned_order($orderId, $pincode);
+    echo view('includes/header', $data);
+    echo view('includes/sidebar');
+    echo view('change_assign_order', $data); 
+    echo view('includes/footer'); 
+}
+
+public function re_assign_order()
+{
+    $orderId     = $this->request->getPost('order_id');
+    $associateid = $this->request->getPost('associate_id');
+    $programid   = $this->request->getPost('program_id');
+    $pincode     = $this->request->getPost('pincode');
+
+    $m_program_apply = new \App\Models\M_program_apply();
+    $resp = $m_program_apply->change_assigne($orderId, $associateid);
+    
+    $targetUrl = base_url("common/change_assign_order/$orderId/$pincode/$programid/$associateid");
+
+    if ($resp) {
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                "status"   => true,
+                "message"  => "Associate changed successfully",
+                "redirect" => $targetUrl
+            ]);
+        }
+        return redirect()->to($targetUrl);
+    } else {
+        return $this->response->setJSON(["status" => false, "message" => "Error, try again.."]);
+    }
+}
+
 }
 ?>

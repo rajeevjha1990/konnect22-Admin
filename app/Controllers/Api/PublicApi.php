@@ -120,15 +120,6 @@ private function auto_assign_volunteer($orderId)
 
     return $selectedVolunteer;
 }
-public function change_assign_order($orderId,$pincode)
-  {
-       $m_program_apply = new \App\Models\M_program_apply();
-      $admindata['admin_name'] = $this->session->get('admin_name');
-      $respdata['orders']=$m_program_apply->get_orders();
-      echo view('includes/header',$admindata);
-      echo view('includes/sidebar');
-      echo view('sanitary_orders',$respdata);
-      echo view('includes/footer');
-  }
+
 }
 ?>

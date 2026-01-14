@@ -29,12 +29,14 @@ class M_program_apply extends Model
   {
     return  $this->insert($data);
   }
-public function get_orders()
+public function get_orders($programid)
     {
         $this->where('order_status',0);
+        $this->where('program_id',$programid);
         $this->select('p.name,v.volntr_name,v.volntr_ep_temp,new_sanitary_order.*');
         $this->join('programs p','p.id=new_sanitary_order.program_id','left');
         $this->join('volunteer v','v.volntr_id=new_sanitary_order.associate_id','left');
+        $this->orderBy('order_id','DESC');
         return $this->get()->getResult();
     }
 public function getOrderById($orderId)
@@ -63,6 +65,12 @@ public function assigned_order($orderId, $pincode)
         $this->where('order_pincode',$pincode);
         return $this->get()->getRow();
     }
-
+public function change_assigne($orderId, $volunteerId)
+{
+    return $this->where('order_id', $orderId)->set([
+        'associate_id' => $volunteerId,
+        'assigned_at'  => date('Y-m-d H:i:s')
+    ])->update();
+}
 }
 ?>
