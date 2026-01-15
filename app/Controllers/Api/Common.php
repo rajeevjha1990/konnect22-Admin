@@ -311,5 +311,43 @@ public function distributed_saintries()
       $response['countgroup']=$m_group->get_allGroupCount($vlntrId);
       return json_encode($response);
     }
+    public function assigned_orders()
+    {
+      $vlntrId = $this->volunteerData->volntr_id;
+      $m_program_apply = new \App\Models\M_program_apply();
+      $response['assigned_orders']=$m_program_apply->assigned_orders($vlntrId);
+      return json_encode($response);
+    }
+public function near_my_associates()
+  {
+    $volntr_id = $this->volunteerData->volntr_id;
+    $vlntrpincode = $this->volunteerData->volntr_pincode;
+    $m_volunteer= new \App\Models\M_volunteer();
+    $response['nearmyassociates']=$m_volunteer->mynerasteassoictes($vlntrpincode,$volntr_id);
+    return json_encode($response);
+  }
+public function order_assigned_your_associate()
+{
+    $orderId     = $this->request->getVar('order_id');
+    $associateId = $this->request->getVar('associate_id');
+    $volntr_id   = $this->volunteerData->volntr_id; // Variable name dhyan dein $volntr_id hai
+
+    $m_program_apply = new \App\Models\M_program_apply();
+    
+    $result = $m_program_apply->order_assigned_your_associate($orderId, $associateId, $volntr_id);
+
+    if ($result) {
+        return $this->response->setJSON([
+            'status' => true,
+            'msg'    => 'Order successfully assigned to the associate.'
+        ]);
+    }
+
+    return $this->response->setJSON([
+        'status' => false,
+        'msg'    => 'Failed to assign order. Please try again.'
+    ]);
+}
+
 }
 ?>

@@ -119,6 +119,13 @@ public function getVolunteersByPincode($pincode)
                 ->where('volntr_pincode', $pincode)
                 ->findAll();
 }
+public function mynerasteassoictes($pincode, $currentUserId)
+{
+    return $this->where('volntr_status', 1)
+                ->where('volntr_pincode', $pincode)
+                ->where('volntr_id !=', $currentUserId)
+                ->findAll();
+}
 
 }
 ?>

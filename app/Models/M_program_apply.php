@@ -65,6 +65,12 @@ public function assigned_order($orderId, $pincode)
         $this->where('order_pincode',$pincode);
         return $this->get()->getRow();
     }
+public function assigned_orders($associateId)
+{
+     
+        $this->where('associate_id',$associateId);
+        return $this->get()->getResult();
+    }
 public function change_assigne($orderId, $volunteerId)
 {
     return $this->where('order_id', $orderId)->set([
@@ -72,5 +78,16 @@ public function change_assigne($orderId, $volunteerId)
         'assigned_at'  => date('Y-m-d H:i:s')
     ])->update();
 }
+public function order_assigned_your_associate($orderId, $associateId, $volntr_id)
+{
+    return $this->where('order_id', $orderId)
+                ->where('associate_id', $volntr_id) 
+                ->set([
+                    'associate_id' => $associateId,
+                    'assigned_at'  => date('Y-m-d H:i:s')
+                ])
+                ->update();
+}
+
 }
 ?>

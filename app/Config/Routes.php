@@ -78,6 +78,9 @@ $routes->group('api/common', function($routes) {
     $routes->match(['post','options'], 'get_allsainetriCount', 'Api\Common::get_allsainetriCount');
     $routes->match(['post','options'], 'get_allGroupCount', 'Api\Common::get_allGroupCount');
     $routes->match(['post','options'], 'getProgramsAndGroups', 'Api\Common::getProgramsAndGroups');
+    $routes->match(['post','options'], 'assigned_orders', 'Api\Common::assigned_orders');
+    $routes->match(['post','options'], 'near_my_associates', 'Api\Common::near_my_associates');
+    $routes->match(['post','options'], 'order_assigned_your_associate', 'Api\Common::order_assigned_your_associate');
 
 });
 $routes->group('api/upload', function($routes) {
