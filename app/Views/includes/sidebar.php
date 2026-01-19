@@ -26,6 +26,12 @@
             <i class="fas fa-map-marked-alt"></i> States
           </a>
         </li>
+        <li>
+          <a href="<?= base_url('adminauth/events'); ?>">
+            <i class="fas fa-calendar-check"></i>
+             Events
+          </a>
+        </li>
       </ul>
     </li>
 

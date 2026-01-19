@@ -15,13 +15,18 @@ $routes->get('/adminauth/group_members/(:num)/(:num)', 'Admin_auth::group_member
 $routes->get('/adminauth/volunteers', 'Admin_auth::volunteers');
 $routes->get('/adminauth/programs', 'Admin_auth::programs');
 $routes->get('/adminauth/new_program', 'Admin_auth::new_program');
+$routes->get('/adminauth/new_event', 'Admin_auth::new_event');
 $routes->get('/adminauth/edit_program/(:num)', 'Admin_auth::edit_program/$1');
+$routes->get('/adminauth/edit_event/(:num)', 'Admin_auth::edit_event/$1');
 $routes->get('/adminauth/new_associate', 'Admin_auth::new_associate');
 $routes->get('/adminauth/edit_associate/(:num)', 'Admin_auth::edit_associate/$1');
 $routes->get('/adminauth/delete_associate/(:num)', 'Admin_auth::delete_associate/$1');
 $routes->get('/adminauth/delete_program/(:num)', 'Admin_auth::delete_program/$1');
 $routes->post('/adminauth/save_volunteer', 'Admin_auth::save_volunteer');
 $routes->post('/adminauth/save_program', 'Admin_auth::save_program');
+$routes->post('/adminauth/save_event_master', 'Admin_auth::save_event_master');
+$routes->get('/adminauth/events', 'Admin_auth::events');
+
 $routes->get('dashboard', 'Dashboard::index');
 $routes->get('/common/states', 'Common::states');
 $routes->get('/common/districts/(:num)', 'Common::districts/$1');
@@ -88,5 +93,6 @@ $routes->group('api/upload', function($routes) {
 });
 $routes->group('api/publicApi', function($routes) {
     $routes->match(['post','options'], 'apply_program', 'Api\PublicApi::apply_program');
+    $routes->match(['post','options'], 'get_new_events', 'Api\PublicApi::get_new_events');
 });
 

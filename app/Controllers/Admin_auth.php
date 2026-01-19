@@ -259,6 +259,7 @@ public function group_members($groupId,$volunteerId)
     echo view('group_members',$respdata);
     echo view('includes/footer');
   }
+
 public function new_associate()
   {
     $data=$this->data;
@@ -394,5 +395,150 @@ public function delete_associate($id)
           ->setHeader('Content-Type', 'application/json')
           ->setBody(json_encode($response));
         }
+public function save_event_master()
+{
+    $id = $this->request->getPost('event_id');
+
+    // VALIDATION RULES
+    $rules = [
+        'event_name' => 'required',
+        'event_date' => 'required',
+        'event_icon' => 'permit_empty|is_image[event_icon]|max_size[event_icon,2048]|mime_in[event_icon,image/jpg,image/jpeg,image/png,image/gif]',
+    ];
+
+    // CUSTOM ERROR MESSAGES
+    $this->validation->setRules($rules, [
+        'event_name' => [
+            'required' => 'Event name is required.'
+        ],
+        'event_date' => [
+            'required' => 'Event date is required.'
+        ],
+        'event_icon' => [
+            'is_image' => 'The uploaded file must be an image.',
+            'max_size' => 'The image file size must not exceed 2MB.',
+            'mime_in' => 'The image must be a valid type (JPG, JPEG, PNG, GIF).'
+        ]
+    ]);
+
+    // VALIDATION FAILED
+    if (!$this->validation->withRequest($this->request)->run()) {
+        return $this->response->setJSON([
+            'status' => false,
+            'err'    => $this->validation->getErrors()
+        ]);
+    }
+
+    // COLLECT DATA
+    $eventName = trim($this->request->getPost('event_name'));
+
+    $data = [
+        'event_name' => $eventName,
+        'event_date' => $this->request->getPost('event_date'),
+    ];
+
+    // MODEL
+    $m_event = new \App\Models\M_event();
+
+    // Get old event for update
+    $oldEvent = null;
+    if (!empty($id)) {
+        $oldEvent = $m_event->find($id);
+    }
+
+    // ICON UPLOAD
+    $file = $this->request->getFile('event_icon');
+    if ($file && $file->isValid() && !$file->hasMoved()) {
+        // Delete old icon if exists
+        if ($oldEvent && !empty($oldEvent->event_icon)) {
+            $oldIconPath = FCPATH . 'uploads/event_icons/' . $oldEvent->event_icon;
+            if (file_exists($oldIconPath)) {
+                unlink($oldIconPath);
+            }
+        }
+
+        // Ensure upload directory exists
+        $uploadPath = FCPATH . 'uploads/event_icons/';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
+        $iconName = $file->getRandomName();
+        $tempPath = $file->getTempName();
+        $targetPath = $uploadPath . $iconName;
+        if (move_uploaded_file($tempPath, $targetPath)) {
+            $data['event_icon'] = $iconName;
+        } else {
+            return $this->response->setJSON([
+                "status"  => false,
+                "message" => "Failed to upload the image. Please try again."
+            ]);
+        }
+    }
+
+    // 🔴 UNIQUE NAME CHECK (ONLY VALIDATION)
+    if ($m_event->event_name_exists($eventName, $id)) {
+        return $this->response->setJSON([
+            "status"  => false,
+            "message" => "This event name already exists!"
+        ]);
+    }
+
+    // INSERT OR UPDATE
+    if (!empty($id)) {
+        $resp = $m_event->update_event($data, $id);
+        $msg  = "Event updated successfully";
+    } else {
+        $resp = $m_event->insert_event($data);
+        $msg  = "Event added successfully";
+    }
+
+    // FINAL RESPONSE
+    if ($resp) {
+        return $this->response->setJSON([
+            "status"   => true,
+            "message"  => $msg,
+            "redirect" => base_url('adminauth/events')
+        ]);
+    } else {
+        return $this->response->setJSON([
+            "status"  => false,
+            "message" => "Error, try again.."
+        ]);
+    }
+}
+public function events()
+  {
+    $data=$this->data;
+    $m_event = new \App\Models\M_event();
+    $data['admin_name'] = $this->session->get('admin_name');
+    $respdata['events']=$m_event->get_events();
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('events',$respdata);
+    echo view('includes/footer');
+  }
+public function new_event()
+  {
+    $data=$this->data;
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('event_form');
+    echo view('includes/footer');
+  }
+public function edit_event($id)
+  {
+
+    $data=$this->data;
+    $m_event = new \App\Models\M_event();
+    $data['admin_name'] = $this->session->get('admin_name');
+    $eventdata['event']=$m_event->get_event($id);
+  
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('event_form',$eventdata);
+    echo view('includes/footer');
+  }
 }
 ?>

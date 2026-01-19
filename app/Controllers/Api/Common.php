@@ -27,6 +27,7 @@ public function getPrograms()
     $response['programs']=$m_program->get_programs();
     return json_encode($response);
   }
+
 public function epGropus()
   {
     $m_group = new \App\Models\M_group();

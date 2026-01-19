@@ -22,7 +22,6 @@ class M_group extends Model
     ];
   public function get_groups($vlntrId)
     {
-      //$this->where('group_status',1);
       $this->where('group_volunteer',$vlntrId);
       return $this->get()->getResult();
     }

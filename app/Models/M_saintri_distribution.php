@@ -65,11 +65,13 @@ public function distributed_saintries($volntrId, $limit = 20, $offset = 0)
 public function saintri_distribution($volntrId)
 {
     $builder = $this->db->table('saintri_distribution');
+    $today = date('Y-m-d');
 
     $builder->select('saintri_distribution.*, d.district_name');
     $builder->join('district d', 'd.district_id = saintri_distribution.district', 'left');
     $builder->where('saintri_distribution.volunteer_id', $volntrId);
     $builder->where('saintri_distribution.status', 1);
+    $builder->where('issue_date',  $today);
     $builder->orderBy('saintri_distribution.id', 'DESC');
 
     $query = $builder->get();

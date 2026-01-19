@@ -12,7 +12,7 @@
 <body>
 
 <div class="content">
-    <h2>Distributed Saintri by<br> <?php echo $volunteer->volntr_name.'-'.($volunteer->volntr_ep_temp);?></h2>
+    <h2>Today's Distributed Saintri by<br> <?php echo $volunteer->volntr_name.'-'.($volunteer->volntr_ep_temp);?></h2>
     <table id="myTable" class="display" style="width:100%">
         <thead>
             <tr>

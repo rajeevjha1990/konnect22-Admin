@@ -120,6 +120,11 @@ private function auto_assign_volunteer($orderId)
 
     return $selectedVolunteer;
 }
-
+public function get_new_events()
+  {
+    $m_event = new \App\Models\M_event();
+    $response['events']=$m_event->get_events();
+    return json_encode($response);
+  }
 }
 ?>

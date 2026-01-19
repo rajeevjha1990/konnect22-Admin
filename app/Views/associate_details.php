@@ -67,7 +67,11 @@
         <?php foreach ($groups as $g){ ?>
           <tr>
             <td><?php echo $g->group_name; ?></td>
-            <td><?php echo $g->group_noof_member; ?></td>
+            <td>
+              <a href="<?php echo base_url('adminauth/group_members/'.$g->group_id.'/'.$g->group_volunteer); ?>">
+              <?php echo $g->group_noof_member; ?> View Members
+              </a>
+            </td>
             <td><?php echo $g->group_senior_epno; ?></td>
             <td><?php echo date('d-m-Y', strtotime($g->group_start_date)); ?></td>
           </tr>
