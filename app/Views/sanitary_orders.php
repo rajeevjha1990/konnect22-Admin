@@ -40,9 +40,9 @@
     </thead>
 
     <tbody>
-    <?php $i=1; foreach ($orders as $row) { ?>
+    <?php $i=1; foreach ($orders as $row) {  ?>
         <tr>
-            <td><?php echo $row->order_id; ?></td>
+            <td><?php echo $i++; ?></td>
             <td><?php echo $row->name; ?></td>
             <td><?php echo $row->order_name; ?></td>
             <td><?php echo $row->order_number; ?></td>

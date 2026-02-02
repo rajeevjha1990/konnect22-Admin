@@ -208,8 +208,68 @@ public function block_villages()
 
 public function saintri_distribution()
 {
-    $mobile = $this->request->getVar('mobile');
     $m_saintri = new \App\Models\M_saintri_distribution();
+
+    $id     = $this->request->getVar('id'); // edit mode
+    $mobile = $this->request->getVar('mobile');
+
+    // ==============================
+    // 🟡 UPDATE MODE (EDIT)
+    // ==============================
+    if (!empty($id)) {
+
+        // 🔍 Last paid membership
+        $lastPaid = $m_saintri->getLastMembershipPaid($mobile);
+
+        $membershipAmount = 0;
+
+        if (!$lastPaid) {
+            // first time
+            $membershipAmount = $this->request->getVar('membership_amount');
+        } else {
+            $lastPaidDate = strtotime($lastPaid->issue_date);
+            $oneYearLater = strtotime('+1 year', $lastPaidDate);
+
+            if (time() >= $oneYearLater) {
+                $membershipAmount = $this->request->getVar('membership_amount');
+            } else {
+                $membershipAmount = 0;
+            }
+        }
+
+        $updateData = [
+            'member_name' => $this->request->getVar('member_name'),
+            'age'         => $this->request->getVar('age'),
+            'guardian'    => $this->request->getVar('guardian'),
+            'village'     => $this->request->getVar('village'),
+            'block'       => $this->request->getVar('block_id'),
+            'district'    => $this->request->getVar('district_id'),
+            'state'       => $this->request->getVar('state_id'),
+            'pincode'     => $this->request->getVar('pincode'),
+            'mobile'      => $mobile,
+            'membership_amount' => $membershipAmount, // ✅ IMPORTANT
+        ];
+
+        $result = $m_saintri->updatedata($id, $updateData);
+
+        if ($result) {
+            return $this->response->setJSON([
+                'status' => true,
+                'msg'    => ($membershipAmount > 0)
+                    ? 'Record updated and membership charged.'
+                    : 'Record updated (No membership charge).'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => false,
+            'msg'    => 'Update failed.'
+        ]);
+    }
+
+    // ==============================
+    // 🟢 INSERT / RE-ISSUE MODE
+    // ==============================
 
     //  Old active record
     $oldRecord = $m_saintri->getOldRecord($mobile);
@@ -218,23 +278,20 @@ public function saintri_distribution()
         $m_saintri->updateOldRecord($oldRecord->id);
     }
 
-    //  Last paid membership (for yearly check)
+    //  Last paid membership
     $lastPaid = $m_saintri->getLastMembershipPaid($mobile);
 
-    $membershipAmount = 0; // default: no charge
+    $membershipAmount = 0;
 
     if (!$lastPaid) {
-        //  First time member → full charge
         $membershipAmount = $this->request->getVar('membership_amount');
     } else {
         $lastPaidDate = strtotime($lastPaid->issue_date);
         $oneYearLater = strtotime('+1 year', $lastPaidDate);
 
         if (time() >= $oneYearLater) {
-            //  1 saal complete → charge again
             $membershipAmount = $this->request->getVar('membership_amount');
         } else {
-            //  1 saal complete nahi hua → FREE renewal
             $membershipAmount = 0;
         }
     }
@@ -243,21 +300,18 @@ public function saintri_distribution()
     $saintriData = [
         'volunteer_id' => $this->volunteerData->volntr_id,
         'member_name' => $oldRecord->member_name ?? $this->request->getVar('member_name'),
-        'age' => $oldRecord->age ?? $this->request->getVar('age'),
-        'guardian' => $oldRecord->guardian ?? $this->request->getVar('guardian'),
-        'village' => $oldRecord->village ?? $this->request->getVar('village'),
-        'post' => $oldRecord->post ?? $this->request->getVar('block_id'),
-        'district' => $oldRecord->district ?? $this->request->getVar('district_id'),
-        'state' => $oldRecord->state ?? $this->request->getVar('state_id'),
-        'pincode' => $oldRecord->pincode ?? $this->request->getVar('pincode'),
-        'mobile' => $mobile,
-
-        //  YEARLY MEMBERSHIP CONTROL
+        'age'         => $oldRecord->age ?? $this->request->getVar('age'),
+        'guardian'    => $oldRecord->guardian ?? $this->request->getVar('guardian'),
+        'village'     => $oldRecord->village ?? $this->request->getVar('village'),
+        'block'       => $oldRecord->post ?? $this->request->getVar('block_id'),
+        'district'    => $oldRecord->district ?? $this->request->getVar('district_id'),
+        'state'       => $oldRecord->state ?? $this->request->getVar('state_id'),
+        'pincode'     => $oldRecord->pincode ?? $this->request->getVar('pincode'),
+        'mobile'      => $mobile,
         'membership_amount' => $membershipAmount,
-
-        'issue_date' => date('Y-m-d'),
-        'status' => 1,
-        'created' => date('Y-m-d H:i:s')
+        'issue_date'  => date('Y-m-d'),
+        'status'      => 1,
+        'created'     => date('Y-m-d H:i:s')
     ];
 
     $result = $m_saintri->insert($saintriData);
@@ -276,6 +330,7 @@ public function saintri_distribution()
         'msg' => 'Distribution failed.'
     ]);
 }
+
 public function distributed_saintries()
 {
     $vlntrId = $this->volunteerData->volntr_id;
@@ -347,6 +402,72 @@ public function order_assigned_your_associate()
     return $this->response->setJSON([
         'status' => false,
         'msg'    => 'Failed to assign order. Please try again.'
+    ]);
+}
+public function get_sainnetri()
+    {
+        $id=$this->request->getVar('id');
+        $m_saintri=new \App\Models\M_saintri_distribution();
+        $resp_data['saintriData']=$m_saintri->get_sainnetri($id);
+        return json_encode($resp_data);
+    }
+public function get_state_by_id()
+{
+    $stateId = $this->request->getVar('stateId'); 
+    $locationModel = new \App\Models\M_state();
+    $resp_data['state'] = $locationModel->state($stateId);
+    return json_encode($resp_data);
+}
+
+
+public function get_district_by_id()
+{
+    $districtId = $this->request->getVar('districtId');
+    $locationModel = new \App\Models\M_district();
+    $resp_data['district'] = $locationModel->get_district($districtId);
+    return json_encode($resp_data);
+}
+
+
+public function get_block_by_id()
+{
+    $blockId = $this->request->getVar('blockId');
+    $locationModel = new \App\Models\M_block();
+    $resp_data['block'] = $locationModel->get_block($blockId);
+    return json_encode($resp_data);
+}
+
+public function get_village_by_id()
+{
+    $villageId = $this->request->getVar('villageId');
+    $locationModel = new \App\Models\M_village();
+    $resp_data['village'] = $locationModel->get_village($villageId);
+    return json_encode($resp_data);
+}
+public function get_notifications()
+  {
+    $m_notification = new \App\Models\M_notification();
+    $response['notifications']=$m_notification->get_notifications_with_read_status($this->volunteerData->volntr_id);
+    return json_encode($response);
+  }
+public function markNotificationRead()
+{
+    $user_id =$this->volunteerData->volntr_id;
+    $notification_id = $this->request->getPost('notification_id');
+
+    $m_notification = new \App\Models\M_user_notification();
+    $m_notification->mark_as_read($user_id, $notification_id);
+
+    return $this->response->setJSON(['status' => true]);
+}
+public function unreadNotificationCount()
+{
+    $user_id = $this->volunteerData->volntr_id;
+    $model = new \App\Models\M_notification();
+    $count = $model->get_unread_notification_count($user_id);
+    return $this->response->setJSON([
+        'status' => true,
+        'count'  => $count
     ]);
 }
 

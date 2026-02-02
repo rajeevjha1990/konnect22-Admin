@@ -14,7 +14,7 @@ class M_saintri_distribution extends Model
         'age',
         'guardian',
         'village',
-        'post',
+        'block',
         'police_station',
         'district',
         'state',
@@ -31,6 +31,12 @@ class M_saintri_distribution extends Model
   public function saintri_insert($saintriData)
     {
       return  $this->insert($saintriData);
+    }
+public function updatedata($id,$updateData)
+    {
+      $this->set($updateData);
+      $this->where('id',$id);
+      return $this->update();
     }
   public function getOldRecord($mobile)
   {
@@ -107,6 +113,13 @@ public function filterSaintri($id, $from, $to) {
         ->where('DATE(issue_date) <=', $to)
         ->get()
         ->getResult();
+}
+public function get_sainnetri($id)
+{
+    return $this->builder()
+        ->where('id', $id)
+        ->get()
+        ->getRow();
 }
 
 }

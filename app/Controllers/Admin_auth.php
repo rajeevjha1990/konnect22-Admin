@@ -476,7 +476,7 @@ public function save_event_master()
         }
     }
 
-    // 🔴 UNIQUE NAME CHECK (ONLY VALIDATION)
+    //UNIQUE NAME CHECK (ONLY VALIDATION)
     if ($m_event->event_name_exists($eventName, $id)) {
         return $this->response->setJSON([
             "status"  => false,
@@ -540,5 +540,154 @@ public function edit_event($id)
     echo view('event_form',$eventdata);
     echo view('includes/footer');
   }
+public function create_notification()
+  {
+    $data=$this->data;
+    $data['admin_name'] = $this->session->get('admin_name');
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('create_notification');
+    echo view('includes/footer');
+  }
+public function save_notification()
+{
+    $id = $this->request->getVar('id');
+    // Validation rules
+    $rules = [
+        'nftn_title' => 'required',
+        'nftn_text'  => 'required',
+    ];
+
+    $this->validation->setRules($rules, [
+        'nftn_title' => [
+            'required' => 'Notification title is required.'
+        ],
+        'nftn_text' => [
+            'required' => 'Notification text is required.'
+        ]
+    ]);
+
+    if (!$this->validation->withRequest($this->request)->run()) {
+        return $this->response->setJSON([
+            'status' => false,
+            'err'    => $this->validation->getErrors()
+        ]);
+    }
+
+    // Data to save
+    $data = [
+        'nftn_title' => $this->request->getVar('nftn_title'),
+        'nftn_text'  => $this->request->getVar('nftn_text'),
+    ];
+
+    $m_notification = new \App\Models\M_notification();
+
+    if (!empty($id)) {
+        // update
+        $resp = $m_notification->update_notification($data, $id);
+        $msg  = "Notification updated successfully";
+    } else {
+        // insert
+        $resp = $m_notification->insert_notification($data);
+        $msg  = "Notification added successfully";
+    }
+
+    if ($resp) {
+        return $this->response->setJSON([
+            "status"   => true,
+            "message"  => $msg,
+            "redirect" => base_url('adminauth/notifications')
+        ]);
+    } else {
+        return $this->response->setJSON([
+            "status"  => false,
+            "message" => "Error, try again.."
+        ]);
+    }
+}
+public function notifications()
+  {
+    $data=$this->data;
+    $m_notification = new \App\Models\M_notification();
+    $data['admin_name'] = $this->session->get('admin_name');
+    $respdata['notifications']=$m_notification->get_notifications();
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('notifications',$respdata);
+    echo view('includes/footer');
+  }
+  public function edit_notification($id)
+  {
+
+    $data=$this->data;
+    $m_notification = new \App\Models\M_notification();
+    $data['admin_name'] = $this->session->get('admin_name');
+    $notificationdata['notification']=$m_notification->get_notification($id);
+  
+    echo view('includes/header',$data);
+    echo view('includes/sidebar',$data);
+    echo view('create_notification',$notificationdata);
+    echo view('includes/footer');
+  }
+public function delete_notification($id)
+{
+    $m_notification = new \App\Models\M_notification();
+    $data = $m_notification->delete_notification($id);
+    $response = [];
+    if ($data === false) {
+        $response['success'] = false;
+        $response['err']     = "Notification not removed.";
+    } else {
+        $response['success'] = true;
+        $response['message'] = "Notification removed successfully.";
+        $response['reload']  = 1;
+    }
+    return $this->response
+          ->setHeader('Content-Type', 'application/json')
+          ->setBody(json_encode($response));
+        }
+public function messages()
+ {
+    $data=$this->data;
+    $msgModel = new M_message();
+    $data['messages'] = $msgModel->get_all_messages();
+    echo view('admin/includes/header');
+    echo view('admin/message_list', $data);
+    echo view('admin/includes/footer');
+    }
+public function create_message()
+    {
+        $userModel = new M_user();
+        $data['users'] = $userModel->findAll();
+
+        echo view('admin/includes/header');
+        echo view('admin/message_create', $data);
+        echo view('admin/includes/footer');
+    }
+
+public function send_message()
+{
+    $users = $this->request->getPost('user_ids'); // array
+    $data = [
+        'msg_title' => $this->request->getPost('title'),
+        'msg_text'  => $this->request->getPost('text')
+    ];
+
+    $msgModel = new \App\Models\M_message();
+    $msg_id = $msgModel->insert($data);
+
+    if ($msg_id) {
+        $userMsgModel = new \App\Models\M_user_message();
+
+        foreach ($users as $uid) {
+            $userMsgModel->insert([
+                'user_id' => $uid,
+                'msg_id'  => $msg_id
+            ]);
+        }
+    }
+        return redirect()->back()->with('success', 'Message sent');
+    }
+
 }
 ?>

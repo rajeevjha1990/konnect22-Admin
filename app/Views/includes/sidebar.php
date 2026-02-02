@@ -40,8 +40,6 @@
         <i class="fas fa-users"></i> Associates
       </a>
     </li>
-
-    <!-- Dynamic Programs Menu (Corrected) -->
     <li>
       <a href="javascript:void(0)" class="accordion-btn">
         <i class="fas fa-hand-holding-medical"></i>Website Orders 
@@ -68,6 +66,20 @@
         <i class="fas fa-edit"></i> Group Edit Requests
       </a>
     </li>
-
+    <li>
+      <a href="<?= base_url('adminauth/group_edit_requests'); ?>">
+        <i class="fas fa-edit"></i> News & Events
+      </a>
+    </li>
+    <li>
+      <a href="<?= base_url('adminauth/create_notification'); ?>">
+        <i class="fas fa-bell"></i> Notifications
+      </a>
+    </li>
+    <li>
+      <a href="<?= base_url('adminauth/create_message'); ?>">
+        <i class="fas fa-envelope"></i> New Message
+      </a>
+    </li>
   </ul>
 </div>

@@ -26,6 +26,7 @@ $routes->post('/adminauth/save_volunteer', 'Admin_auth::save_volunteer');
 $routes->post('/adminauth/save_program', 'Admin_auth::save_program');
 $routes->post('/adminauth/save_event_master', 'Admin_auth::save_event_master');
 $routes->get('/adminauth/events', 'Admin_auth::events');
+$routes->get('/adminauth/create_message', 'Admin_auth::create_message');
 
 $routes->get('dashboard', 'Dashboard::index');
 $routes->get('/common/states', 'Common::states');
@@ -49,6 +50,12 @@ $routes->post('/common/filter_associate_data', 'Common::filter_associate_data');
 $routes->get('/common/sanitry_orders/(:num)', 'Common::sanitry_orders/$1');
 $routes->get('/common/change_assign_order/(:num)/(:num)/(:num)/(:num)', 'Common::change_assign_order/$1/$2/$3/$4');
 $routes->post('/common/re_assign_order', 'Common::re_assign_order');
+
+$routes->get('/adminauth/create_notification', 'Admin_auth::create_notification');
+$routes->post('/adminauth/save_notification', 'Admin_auth::save_notification');
+$routes->get('/adminauth/notifications', 'Admin_auth::notifications');
+$routes->get('/adminauth/edit_notification/(:num)', 'Admin_auth::edit_notification/$1');
+$routes->get('/adminauth/delete_notification/(:num)', 'Admin_auth::delete_notification/$1');
 
 
 $routes->group('api/auth', function($routes) {
@@ -86,6 +93,16 @@ $routes->group('api/common', function($routes) {
     $routes->match(['post','options'], 'assigned_orders', 'Api\Common::assigned_orders');
     $routes->match(['post','options'], 'near_my_associates', 'Api\Common::near_my_associates');
     $routes->match(['post','options'], 'order_assigned_your_associate', 'Api\Common::order_assigned_your_associate');
+
+$routes->match(['post','options'], 'get_sainnetri', 'Api\Common::get_sainnetri');
+$routes->match(['post','options'], 'get_state_by_id', 'Api\Common::get_state_by_id');
+$routes->match(['post','options'], 'get_district_by_id', 'Api\Common::get_district_by_id');
+$routes->match(['post','options'], 'get_block_by_id', 'Api\Common::get_block_by_id');
+$routes->match(['post','options'], 'get_village_by_id', 'Api\Common::get_village_by_id');
+$routes->match(['post','options'], 'get_notifications', 'Api\Common::get_notifications');
+$routes->match(['post','options'], 'markNotificationRead', 'Api\Common::markNotificationRead');
+$routes->match(['post','options'], 'unreadNotificationCount', 'Api\Common::unreadNotificationCount');
+
 
 });
 $routes->group('api/upload', function($routes) {

@@ -75,13 +75,13 @@ private function auto_assign_volunteer($orderId)
     $m_volunteer = new \App\Models\M_volunteer();
     $m_apply     = new \App\Models\M_program_apply();
 
-    // 1️⃣ Get order
+    //  Get order
     $order = $m_apply->getOrderById($orderId);
     if (!$order) return null;
 
     $orderPincode = $order['order_pincode'];
 
-    // 2️⃣ Get same pincode volunteers
+    //  Get same pincode volunteers
     $volunteers = $m_volunteer->getVolunteersByPincode($orderPincode);
     if (empty($volunteers)) return null;
 
@@ -94,7 +94,7 @@ private function auto_assign_volunteer($orderId)
         $orderCount = $m_apply->get_applycounts($vol['volntr_id']);
         $lastTime   = $vol['last_assigned_at'];
 
-        // 🥇 Never assigned = top priority
+        //  Never assigned = top priority
         if (empty($lastTime)) {
             $selectedVolunteer = $vol['volntr_id'];
             break;
@@ -112,10 +112,10 @@ private function auto_assign_volunteer($orderId)
 
     if (!$selectedVolunteer) return null;
 
-    // 3️⃣ Assign order
+    // 3 Assign order
     $m_apply->assignVolunteerToOrder($orderId, $selectedVolunteer);
 
-    // 4️⃣ Update volunteer time
+    //  Update volunteer time
     $m_volunteer->updateLastAssignedTime($selectedVolunteer);
 
     return $selectedVolunteer;
@@ -126,5 +126,6 @@ public function get_new_events()
     $response['events']=$m_event->get_events();
     return json_encode($response);
   }
+
 }
 ?>
