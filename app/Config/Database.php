@@ -14,7 +14,7 @@ class Database extends Config
         'hostname'     => 'localhost',
         'username'     => 'root',
         'password'     => '',
-        'database'     => 'NGO',
+        'database'     => 'Kennect_22',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
@@ -36,16 +36,21 @@ class Database extends Config
         ],
     ];
 
-    public function __construct()
-    {
-        parent::__construct();
+public function __construct()
+{
+    parent::__construct();
 
-        //LIVE SERVER settings
-        if ($_SERVER['SERVER_NAME'] !== 'localhost') {
-            $this->default['hostname'] = 'localhost';
-            $this->default['username'] = 'NGO';
-            $this->default['password'] = '9MdWOn?k@*L8';
-            $this->default['database'] = 'NGO';
-        }
+    // If running from CLI (like php spark migrate)
+    if (php_sapi_name() === 'cli') {
+        return; // use default config
     }
+
+    // LIVE SERVER settings
+    if (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] !== 'localhost') {
+        $this->default['hostname'] = '127.0.0.1';  // safer than localhost on Linux
+        $this->default['username'] = 'u776838216_jharajeev';
+        $this->default['password'] = 'Rajeev@1990#123';
+        $this->default['database'] = 'u776838216_kennect22';
+    }
+}
 }

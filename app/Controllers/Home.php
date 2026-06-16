@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-class Home extends BaseController
+class Home extends BaseAuthController
 {
     public function index(): string
     {

@@ -29,8 +29,7 @@ abstract class BaseController extends Controller
         $this->session = \Config\Services::session();
 
         // 3. Programs ka data globally load karein
-        $m_program = new M_program();
-        $this->data['programs'] = $m_program->get_programs();
+
         $this->data['admin_name'] = $this->session->get('admin_name');
 
         // CORS Headers (Aapka existing code)

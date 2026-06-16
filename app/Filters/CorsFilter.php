@@ -14,7 +14,7 @@ class CorsFilter implements FilterInterface
 
         header("Access-Control-Allow-Origin: $origin");
         header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
-        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Source, VeronAuthkey, Version');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Source, SVJAuthkey, Version');
 
         // Respond to preflight OPTIONS request
         if ($request->getMethod(true) === 'OPTIONS') {
@@ -22,7 +22,7 @@ class CorsFilter implements FilterInterface
                 ->setStatusCode(200)
                 ->setHeader('Access-Control-Allow-Origin', $origin)
                 ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
-                ->setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Source, VeronAuthkey, Version');
+                ->setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Source, SVJAuthkey, Version');
         }
     }
 
@@ -32,7 +32,7 @@ class CorsFilter implements FilterInterface
 
         $response->setHeader('Access-Control-Allow-Origin', $origin)
                  ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
-                 ->setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Source, VeronAuthkey, Version');
+                 ->setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Source, SVJAuthkey, Version');
 
         return $response;
     }

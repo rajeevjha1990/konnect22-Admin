@@ -19,134 +19,230 @@ class Auth extends BaseAuthController
     // ------------------------------------------
     // Register
     // ------------------------------------------
-  public function volunteer_register()
+// --- User Registration (Step 1: Send OTP) ---
+public function user_register()
 {
-    $this->validation->setRules([
-        'volntr_name' => [
-            'label'  => 'Name',
-            'rules'  => 'required',
-            'errors' => [
-                'required' => 'Name is required.'
-            ]
-        ],
-        'volntr_mobile' => [
-            'label'  => 'Mobile Number',
-            'rules'  => 'required|numeric|min_length[10]|is_unique[volunteer.volntr_mobile]',
-            'errors' => [
-                'required'   => 'Mobile number is required.',
-                'numeric'    => 'Mobile number must contain only digits.',
-                'min_length' => 'Mobile number must be at least 10 digits.',
-                'is_unique'  => 'This mobile number is already registered.'
-            ]
-        ],
-        'volntr_password' => [
-            'label'  => 'Password',
-            'rules'  => 'required',
-            'errors' => [
-                'required' => 'Password is required.'
-            ]
-        ]
-    ]);
+    $mobile = $this->request->getVar('user_mobile');
 
-    if (!$this->validation->withRequest($this->request)->run()) {
-        return $this->response->setStatusCode(400)->setJSON([
+    if (!$mobile || strlen($mobile) != 10) {
+        return $this->response->setJSON([
             'status' => false,
-            'err' => $this->validation->getErrors()
+            'msg' => 'Valid mobile required'
         ]);
     }
 
-    $volunteerModel = new \App\Models\M_volunteer();
+    $userModel = new \App\Models\M_user();
+    $otp = '8888';//rand(1000, 9999);
 
-    $insertData = [
-        'volntr_name'     => $this->request->getVar('volntr_name'),
-        'volntr_mobile'   => $this->request->getVar('volntr_mobile'),
-        'volntr_email'    => $this->request->getVar('volntr_email'),
-        'volntr_password'=> password_hash($this->request->getVar('volntr_password'), PASSWORD_DEFAULT),
-    ];
+    $user = $userModel->where('user_mobile', $mobile)->first();
 
-    $insert = $volunteerModel->insert($insertData);
+    // ✅ USER EXISTS
+    if ($user) {
 
-    if ($insert) {
+        // 👉 अगर verified है
+        if ($user['otp_verified'] == 1) {
+            return $this->response->setJSON([
+                'status' => true,
+                'exists' => true,
+                'verified' => 1,
+                'msg' => 'User already registered. Please login.'
+            ]);
+        }
+
+        // 👉 NOT VERIFIED → OTP UPDATE (🔥 BEST METHOD)
+        $userModel->where('user_mobile', $mobile)
+                  ->set([
+                      'user_otp' => $otp,
+                      'otp_verified' => 0
+                  ])
+                  ->update();
+
+        // 👉 DEBUG CHECK (optional remove later)
+        $updatedUser = $userModel->where('user_mobile', $mobile)->first();
+
         return $this->response->setJSON([
             'status' => true,
-            'msg'    => 'Registration successful.'
-        ]);
-    } else {
-        return $this->response->setStatusCode(500)->setJSON([
-            'status' => false,
-            'msg'    => 'Failed to register user.'
+            'exists' => true,
+            'verified' => 0,
+            'msg' => 'OTP resent successfully',
+            'otp' => $updatedUser['user_otp'] // testing
         ]);
     }
+
+    // ✅ NEW USER
+    $userModel->insert([
+        'user_mobile' => $mobile,
+        'user_otp' => $otp,
+        'otp_verified' => 0
+    ]);
+
+    return $this->response->setJSON([
+        'status' => true,
+        'exists' => false,
+        'verified' => 0,
+        'msg' => 'OTP sent successfully',
+        'otp' => $otp
+    ]);
 }
+    // --- STEP 2: Verify OTP & Update Status ---
+public function verify_otp()
+{
+    $mobile = $this->request->getVar('mobile');
+    $otp    = $this->request->getVar('otp');
 
+    if (!$mobile || !$otp) {
+        return $this->response->setJSON([
+            'status' => false,
+            'msg' => 'Mobile and OTP required'
+        ]);
+    }
 
-    // ------------------------------------------
+    $userModel = new \App\Models\M_user();
+    $user = $userModel->where('user_mobile', $mobile)->first();
+
+    if (!$user || $otp != $user['user_otp']) {
+        return $this->response->setJSON([
+            'status' => false,
+            'msg' => 'Invalid OTP'
+        ]);
+    }
+
+    // OTP verified only
+    $userModel->where('user_mobile', $mobile)
+              ->set([
+                  'otp_verified' => 1,
+                  'user_otp' => null
+              ])
+              ->update();
+
+    return $this->response->setJSON([
+        'status' => true,
+        'msg' => 'OTP verified successfully',
+        'create_password' => true,
+        'mobile' => $mobile
+    ]);
+}
+public function create_password()
+{
+    $mobile           = $this->request->getVar('mobile');
+    $password         = $this->request->getVar('password');
+    $confirm_password = $this->request->getVar('confirm_password');
+
+    if (!$mobile || !$password || !$confirm_password) {
+        return $this->response->setJSON([
+            'status' => false,
+            'msg' => 'All fields are required'
+        ]);
+    }
+
+    if ($password !== $confirm_password) {
+        return $this->response->setJSON([
+            'status' => false,
+            'msg' => 'Password and confirm password must match'
+        ]);
+    }
+
+    if (strlen($password) < 6) {
+        return $this->response->setJSON([
+            'status' => false,
+            'msg' => 'Password must be at least 6 characters'
+        ]);
+    }
+
+    $userModel = new \App\Models\M_user();
+
+    $user = $userModel->where('user_mobile', $mobile)->first();
+
+    if (!$user) {
+        return $this->response->setJSON([
+            'status' => false,
+            'msg' => 'User not found'
+        ]);
+    }
+
+    if ($user['otp_verified'] != 1) {
+        return $this->response->setJSON([
+            'status' => false,
+            'msg' => 'Please verify OTP first'
+        ]);
+    }
+
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    $userModel->where('user_mobile', $mobile)
+              ->set([
+                  'user_password' => $hashedPassword
+              ])
+              ->update();
+
+    // NO AUTHKEY HERE
+    return $this->response->setJSON([
+        'status'  => true,
+        'msg'     => 'Password created successfully',
+        'user_id' => $user['user_id']
+    ]);
+}
+// ------------------------------------------
     // Login
     // ------------------------------------------
 public function login()
 {
-    $this->validation->setRules([
-        'mobile' => [
-            'label' => 'Mobile Number',
-            'rules' => 'required|regex_match[/^[0-9]{10}$/]',
-            'errors' => [
-                'required' => 'Mobile number is required.',
-                'regex_match' => 'Please enter a valid 10-digit mobile number.'
-            ]
-        ],
-        'password' => [
-            'label' => 'Password',
-            'rules' => 'required',
-            'errors' => ['required' => 'Password is required.']
-        ]
-    ]);
-
-    if (!$this->validation->withRequest($this->request)->run()) {
-        return $this->response->setStatusCode(451)->setJSON([
-            'status' => false,
-            'errors' => $this->validation->getErrors()
-        ]);
-    }
-
     $mobile   = $this->request->getVar('mobile');
     $password = $this->request->getVar('password');
 
-    $m_volunteer = new \App\Models\M_volunteer();
-    $volunteer = $m_volunteer->getPassword($mobile);
-
-    if (!$volunteer) {
-        return $this->response->setStatusCode(404)->setJSON([
+    if (!$mobile || !$password) {
+        return $this->response->setJSON([
             'status' => false,
-            'msg' => 'Mobile number not registered.'
+            'msg' => 'Mobile & password required'
         ]);
     }
 
-    $stored_hash = trim($volunteer->volntr_password);
+    $userModel = new \App\Models\M_user();
+    $user = $userModel->where('user_mobile', $mobile)->first();
 
-    if (!password_verify($password, $stored_hash)) {
-        return $this->response->setStatusCode(403)->setJSON([
+    if (!$user) {
+        return $this->response->setJSON([
             'status' => false,
-            'msg' => 'Incorrect password.'
+            'msg' => 'User not found'
         ]);
     }
 
-    // Generate Auth Key
-    $auth = json_encode(["id" => $volunteer->volntr_id]);
+    if ($user['otp_verified'] == 0) {
+        return $this->response->setJSON([
+            'status' => false,
+            'verify_required' => true,
+            'msg' => 'Please verify OTP first'
+        ]);
+    }
+
+    if (!password_verify($password, $user['user_password'])) {
+        return $this->response->setJSON([
+            'status' => false,
+            'msg' => 'Wrong password'
+        ]);
+    }
+
+    // Generate Auth Token ONLY HERE
+    $auth = json_encode([
+        'user_id' => $user['user_id']
+    ]);
+
     $authkey = $this->encrypter->encrypt($auth);
 
     return $this->response->setJSON([
-        "authkey"  => bin2hex($authkey),
-        "volntrid" => $volunteer->volntr_id,
-        "message"  => "You are Successfully Logged In",
         'status'   => true,
+        'msg'      => 'Login successful',
+        'authkey'  => bin2hex($authkey),
+        'user_id'  => $user['user_id']
     ]);
 }
-  public function get_volunteer()
+
+public function get_user()
     {
-      $resp_data["volunteer"] = $this->volunteerData;
+      $resp_data["user"] = $this->userData;
       return json_encode($resp_data);
     }
-    public function logout()
+public function logout()
     {
         $this->session->destroy();
         return $this->response->setJSON([
@@ -154,7 +250,46 @@ public function login()
             'msg' => 'Logout successful.'
         ]);
     }
+public function check_mobile_registered()
+{
+    $this->validation->setRule("mobile", "Mobile", "required|regex_match[/^[1-9][0-9]{9}$/]");
+    $this->validation->withRequest($this->request);
 
+    if (!$this->validation->run()) {
+        return $this->response->setStatusCode(451)->setJSON([
+            "status" => false,
+            "err" => $this->validation->getErrors()
+        ]);
+    }
+
+    $userModel = new \App\Models\M_user();
+    $mobile = $this->request->getVar('mobile');
+    $user = $userModel->checkRegister($mobile);
+
+    // ❌ Not registered
+    if (!$user) {
+        return $this->response->setStatusCode(403)->setJSON([
+            'status' => false,
+            'err' => 'Mobile number not registered.'
+        ]);
+    }
+
+    // ✔ Registered user — send OTP
+    $generatedOtp = rand(1000, 9999);
+    $otpExpiry = gmdate('Y-m-d\TH:i:s\Z', strtotime('+2 minutes'));
+    $hashotp = password_hash($generatedOtp, PASSWORD_DEFAULT);
+
+    $userModel->setOtp($user->user_id, $hashotp, $otpExpiry);
+
+    return $this->response->setJSON([
+        'status' => true,
+        'msg' => 'OTP sent successfully.',
+        'expiryTime' => $otpExpiry,
+        'mobile' => $mobile,
+        'generatedotp' => $generatedOtp
+    ]);
+}
+    
 public function reset_password()
 {
     $this->validation->setRules([
@@ -173,9 +308,9 @@ public function reset_password()
     $mobile = $this->request->getVar('mobileno');
     $newPassword = $this->request->getVar('new_password');
 
-    $volunteerModel = new \App\Models\M_volunteer();
-    $volunteer = $volunteerModel->where('volntr_mobile', $mobile)->first();
-    if (!$volunteer) {
+    $userModel = new \App\Models\M_user();
+    $user = $userModel->where('user_mobile', $mobile)->first();
+    if (!$user) {
         return $this->response->setStatusCode(404)->setJSON([
             'status' => false,
             'msg' => 'Mobile number not found.'
@@ -184,7 +319,7 @@ public function reset_password()
 
     $hashPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-    $result = $volunteerModel->password_reset($volunteer['volntr_id'], $hashPassword);
+    $result = $userModel->password_reset($user['user_id'], $hashPassword);
 
     if ($result) {
         return $this->response->setStatusCode(200)->setJSON([
@@ -200,28 +335,29 @@ public function reset_password()
 }
 
 public function get_profile()
-  {
-    $vlntrId=$this->volunteerData->volntr_id;
-    $volunteerModel = new \App\Models\M_volunteer();
-    $resp_data["profile"] = $volunteerModel->get_volunteer($vlntrId);
-    return json_encode($resp_data);
-  }
+{
+    return $this->response->setJSON([
+        'status' => true,
+        'user'   => $this->userData
+    ]);
+}
   public function update_profile()
     {
       $profiledata=array(
-          'volntr_name'=>$this->request->getVar('volntr_name'),
-          'volntr_mobile'=>$this->request->getVar('volntr_mobile'),
-          'volntr_email'=>$this->request->getVar('volntr_email'),
-          'volntr_ep_temp'=>$this->request->getVar('volntr_ep_temp'),
-          'volntr_qualification'=>$this->request->getVar('volntr_qualification'),
-          'volntr_join_date'=>$this->request->getVar('volntr_join_date'),
-          'volntr_address'=>$this->request->getVar('volntr_address'),
-          'volntr_pincode'=>$this->request->getVar('volntr_pincode'),
-          'volntr_image'=>$this->request->getVar('volntr_image'),
+
+          'user_name'=>$this->request->getVar('user_name'),
+          'user_mobile'=>$this->request->getVar('mobile'),
+          'user_email'=>$this->request->getVar('user_email'),
+          'user_pincode'=>$this->request->getVar('pincode'),
+          'user_state'=>$this->request->getVar('state_id'),
+          'user_district'=>$this->request->getVar('district_id'),
+          'user_block'=>$this->request->getVar('block_id'),
+          'user_village'=>$this->request->getVar('village'),
+         
       );
-      $volunteerModel = new \App\Models\M_volunteer();
-      $vlntrId=$this->volunteerData->volntr_id;
-      $result=$volunteerModel->update_profile($profiledata,$vlntrId);
+      $userModel = new \App\Models\M_user();
+      $userId=$this->userData->user_id;
+      $result=$userModel->update_profile($profiledata,$userId);
       if ($result) {
           return $this->response->setJSON([
               'status' => true,
@@ -234,83 +370,6 @@ public function get_profile()
           ]);
       }
     }
-public function check_mobile_registered()
-{
-    $this->validation->setRule("mobile", "Mobile", "required|regex_match[/^[1-9][0-9]{9}$/]");
-    $this->validation->withRequest($this->request);
-
-    if (!$this->validation->run()) {
-        return $this->response->setStatusCode(451)->setJSON([
-            "status" => false,
-            "err" => $this->validation->getErrors()
-        ]);
-    }
-
-    $volunteerModel = new \App\Models\M_volunteer();
-    $mobile = $this->request->getVar('mobile');
-    $volunteer = $volunteerModel->checkRegister($mobile);
-
-    // ❌ Not registered
-    if (!$volunteer) {
-        return $this->response->setStatusCode(403)->setJSON([
-            'status' => false,
-            'err' => 'Mobile number not registered.'
-        ]);
-    }
-
-    // ✔ Registered user — send OTP
-    $generatedOtp = rand(1000, 9999);
-    $otpExpiry = gmdate('Y-m-d\TH:i:s\Z', strtotime('+2 minutes'));
-    $hashotp = password_hash($generatedOtp, PASSWORD_DEFAULT);
-
-    $volunteerModel->setOtp($volunteer->volntr_id, $hashotp, $otpExpiry);
-
-    return $this->response->setJSON([
-        'status' => true,
-        'msg' => 'OTP sent successfully.',
-        'expiryTime' => $otpExpiry,
-        'mobile' => $mobile,
-        'generatedotp' => $generatedOtp
-    ]);
-}
-public function verify_forgot_otp()
-{
-    $volunteerModel = new \App\Models\M_volunteer();
-
-    $mobile = $this->request->getVar('mobile');
-    $otp    = $this->request->getVar('otp');
-
-    if (!$mobile || !$otp) {
-        return $this->response->setStatusCode(400)->setJSON([
-            'err' => 'Mobile number and OTP are required.'
-        ]);
-    }
-
-    $volunteer = $volunteerModel->checkRegister($mobile);
-    if (!$volunteer) {
-        return $this->response->setStatusCode(404)->setJSON([
-            'err' => 'Mobile number not registered or not verified.'
-        ]);
-    }
-
-  if (strtotime($volunteer->otp_expires_at) < time()) {
-    return $this->response->setStatusCode(403)->setJSON([
-        'err' => 'OTP expired.'
-    ]);
-}
-
-  if (!password_verify($otp, $volunteer->volntr_otp_code)) {
-      return $this->response->setStatusCode(403)->setJSON([
-          'err' => 'Invalid OTP.'
-      ]);
-  }
-    // Clear OTP
-    $volunteerModel->clearOtp($volunteer->volntr_id);
-    return $this->response->setJSON([
-        'msg'     => 'OTP verified successfully.',
-        'consumer_id' => $volunteer->volntr_id
-    ]);
-}
 
 }
 ?>

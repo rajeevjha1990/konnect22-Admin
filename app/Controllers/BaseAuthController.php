@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
@@ -9,54 +10,107 @@ use Psr\Log\LoggerInterface;
 abstract class BaseAuthController extends Controller
 {
     protected $request;
-    protected $volunteerId;
-    protected $volunteerData;
+    protected $userId;
+    protected $userData;
     protected $encrypter;
-    //These methods no need authkey
-    public $public_methods = ["login", "volunteer_register", "forgot_password", "reset_password", "user_login"];
 
-      public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
-    {
+    public $public_methods = [
+        "login",
+        "user_register",
+        "create_password",
+        "verify_otp",
+        "forgot_password",
+        "reset_password",
+        "user_login"
+    ];
+
+    public function initController(
+        RequestInterface $request,
+        ResponseInterface $response,
+        LoggerInterface $logger
+    ) {
         parent::initController($request, $response, $logger);
-        $this->encrypter = \Config\Services::encrypter();
+
         $this->request = $request;
-        $currentMethod = $this->request->getUri()->getSegment(3); // correct
+        $this->encrypter = \Config\Services::encrypter();
+
+        $currentMethod = $this->request->getUri()->getSegment(3);
 
         if (in_array($currentMethod, $this->public_methods)) {
             return;
         }
 
-        // -------- Auth check start --------
-        $authKey = $this->request->getHeaderLine('VeronAuthkey');
-        if (!$authKey) {
-            $this->unauthorized("Authorization header missing.");
+        // ==========================
+        // AUTH CHECK
+        // ==========================
+
+        $authKey = trim($this->request->getHeaderLine('SVJAuthkey'));
+
+        if (empty($authKey)) {
+            $this->unauthorized('SVJAuthkey header missing');
         }
 
         try {
-            $binaryKey = hex2bin($authKey);
-            $decrypted = $this->encrypter->decrypt($binaryKey);
-            $data = json_decode($decrypted, true);
 
-            if (!isset($data['id'])) {
-                throw new \Exception("Invalid token structure.");
+            if (!ctype_xdigit($authKey)) {
+                throw new \Exception('Auth key is not valid hex string');
             }
 
-            $this->volunteerId = $data['id'];
-            $volunteerModel = new \App\Models\M_volunteer();
-            $this->volunteerData = $volunteerModel->get_volunteer($this->volunteerId);
-            if (!$this->volunteerData) {
-                $this->unauthorized("Volunteer not found.");
+            $binaryKey = hex2bin($authKey);
+
+            if ($binaryKey === false) {
+                throw new \Exception('hex2bin failed');
+            }
+
+            $decrypted = $this->encrypter->decrypt($binaryKey);
+
+            if (!$decrypted) {
+                throw new \Exception('Token decrypt failed');
+            }
+
+            $data = json_decode($decrypted, true);
+
+            if (!is_array($data)) {
+                throw new \Exception('JSON decode failed');
+            }
+
+            if (!isset($data['user_id'])) {
+                throw new \Exception('User ID missing in token');
+            }
+
+            $this->userId = $data['user_id'];
+          
+            $userModel = new \App\Models\M_user();
+
+            $this->userData = $userModel->get_user($this->userId);
+
+            if (!$this->userData) {
+                throw new \Exception('User not found');
             }
 
         } catch (\Throwable $e) {
-            $this->unauthorized("Invalid token: " . $e->getMessage());
+
+            return $response
+                ->setStatusCode(401)
+                ->setJSON([
+                    'status' => false,
+                    'error'  => $e->getMessage(),
+                    'authkey_received' => $authKey
+                ])
+                ->send();
+
+            exit;
         }
-        // -------- Auth check end ----------
     }
-    protected function unauthorized($message = "Unauthorized")
+
+    protected function unauthorized($message = 'Unauthorized')
     {
-        echo json_encode(['err' => $message]);
-        http_response_code(401);
-        exit;
+        return $this->response
+            ->setStatusCode(401)
+            ->setJSON([
+                'status' => false,
+                'error' => $message
+            ])
+            ->send();
     }
 }

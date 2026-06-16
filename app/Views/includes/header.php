@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>सबका विकास ज्यति</title>
+    <title>Konnect22</title>
     <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/dataTables.min.css">
     <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/style.css">
@@ -70,7 +70,7 @@
 
 <body>
     <header class="header">
-  <h1>सबका विकास ज्यति</h1>
+  <h1>Konnect22</h1>
   <div class="user-section">
     <a href="<?= base_url(); ?>notifications" class="notification-bell" style="color:#fff; position:relative; font-size:20px;">
       <i class="fas fa-bell"></i>

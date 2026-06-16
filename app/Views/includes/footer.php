@@ -1,6 +1,6 @@
 </div> <!-- end main-container -->
 <footer class="footer">
-    <p>&copy; <?= date("Y") ?> सबका विकास जयति</p>
+    <p>&copy; <?= date("Y") ?> Konnect22</p>
 </footer>
 
 <script src="<?php echo base_url(); ?>/assets/js/jquery-3.6.0.min.js"></script>
@@ -50,7 +50,7 @@ $(document).ready(function () {
                 $submitBtn.prop("disabled", false)
                     .text($submitBtn.data("original-text"));
 
-                // ✅ Success Response
+                //  Success Response
                 if (res.status) {
                     $.notify(res.message || "Success", "success");
 
@@ -67,7 +67,7 @@ $(document).ready(function () {
                     }
                 }
 
-                // ❌ Error Response
+                //  Error Response
                 else {
                     if (res.err) {
                         // If single string error
@@ -150,12 +150,24 @@ $(document).on('click', '.confirm_delete', function(e) {
 
     // Call apiRequest for delete
     apiRequest($this, link, '', 'GET', function(response) {
-        if (response.success) {
-            removeRow(deletedrow);
-            $.notify(response.message, "success");
-        } else {
-            $.notify(response.err || "Delete failed", "error");
-        }
+       if (response.status) {
+
+    deletedrow.fadeOut(300, function () {
+        $(this).remove();
+    });
+
+    $.notify(
+        response.message || "Deleted successfully",
+        "success"
+    );
+
+} else {
+
+    $.notify(
+        response.message || "Delete failed",
+        "error"
+    );
+}
     });
 });
 // ========== Permission Granted Logic ==========

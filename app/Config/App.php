@@ -16,9 +16,8 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-public string $baseURL = 'https://sabkavikasjayti.org/API/';
-
-    /**
+//public string $baseURL = 'https://Konnect22/';
+public string $baseURL = 'https://magenta-owl-204592.hostingersite.com/api/public/';    /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
      * If you want to accept multiple Hostnames, set this.
      *
@@ -199,10 +198,11 @@ public string $baseURL = 'https://sabkavikasjayti.org/API/';
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
-        public function __construct() {
+    
+    public function __construct() {
         parent::__construct();
-        if (trim($_SERVER['SERVER_NAME']) == "localhost") {
-            $this->baseURL = 'https://localhost/SVJ-API/public/';
+        if (isset($_SERVER['SERVER_NAME']) && trim($_SERVER['SERVER_NAME']) == "localhost") {
+            $this->baseURL = 'https://localhost/konnect22/public/';
         }
     }
 }
