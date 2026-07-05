@@ -38,21 +38,13 @@
         <tr>
 
             <th>ID</th>
-
+            <th>Category</th>
             <th>Vendor Code</th>
-
             <th>Shop Name</th>
-
             <th>Owner Name</th>
-
             <th>Mobile</th>
-
             <th>Email</th>
-
-            <th>Status</th>
-
             <th>Created At</th>
-
             <th>Action</th>
 
         </tr>
@@ -76,6 +68,10 @@
             </td>
 
             <td>
+                <?php echo !empty($row->category_name)
+                    ? $row->category_name
+                    : '-'; ?>
+            </td> <td>
                 <?php echo !empty($row->vendor_code)
                     ? $row->vendor_code
                     : '-'; ?>
@@ -105,23 +101,7 @@
                     : '-'; ?>
             </td>
 
-            <td>
-
-                <?php if($row->status == 'Active'){ ?>
-
-                    <span class="badge bg-success">
-                        Active
-                    </span>
-
-                <?php } else { ?>
-
-                    <span class="badge bg-danger">
-                        Inactive
-                    </span>
-
-                <?php } ?>
-
-            </td>
+           
 
             <td>
 

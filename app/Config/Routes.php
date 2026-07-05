@@ -25,6 +25,7 @@ $routes->get('product/edit/(:num)', 'Product::edit/$1');
 $routes->get('product/delete/(:num)', 'Product::delete/$1');
 $routes->post('product/save', 'Product::save');
 $routes->get('product/toggle_featured/(:num)/(:num)', 'Product::toggle_featured/$1/$2');
+$routes->get('vendor/getByCategory/(:num)', 'Vendor::getByCategory/$1');
 
 $routes->get('banner','Banner::index');
 $routes->get('banner/add','Banner::add');
@@ -50,6 +51,10 @@ $routes->group('api/auth', function($routes) {
     $routes->match(['post','options'], 'check_mobile_registered', 'Api\Auth::check_mobile_registered');
     $routes->post('create-password', 'Api\Auth::create_password');
     $routes->match(['post','options'],'create-password','Api\Auth::create-password');
+    $routes->match(['post','options'],'save_address','Api\Auth::save_address');
+    $routes->match(['post','options'],'getAddresses','Api\Auth::getAddresses');
+    $routes->match(['post','options'],'get_address','Api\Auth::get_address');
+    $routes->match(['post','options'],'delete_address','Api\Auth::delete_address');
 });
 
 $routes->group('api/order', function($routes) {

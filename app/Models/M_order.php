@@ -16,11 +16,9 @@ class M_order extends Model
 
         'user_id',
 
-        'order_name',
         'order_number',
 
         'order_address',
-        'order_city',
         'order_pincode',
         'order_landmark',
 

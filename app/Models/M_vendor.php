@@ -13,6 +13,7 @@ class M_vendor extends Model
 
     protected $allowedFields = [
         'vendor_code',
+        'category_id',
         'shop_name',
         'owner_name',
         'mobile',
@@ -31,10 +32,16 @@ class M_vendor extends Model
     |--------------------------------------------------------------------------
     */
     public function getVendors()
-    {
-        return $this->orderBy('id', 'DESC')->findAll();
-    }
-
+{
+    return $this->select('vendors.*, categories.name as category_name')
+                ->join(
+                    'categories',
+                    'categories.id = vendors.category_id',
+                    'left'
+                )
+                ->orderBy('vendors.id', 'DESC')
+                ->findAll();
+}
     /*
     |--------------------------------------------------------------------------
     | Get Single Vendor

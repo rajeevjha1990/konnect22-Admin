@@ -48,9 +48,9 @@ public function __construct()
     // LIVE SERVER settings
     if (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] !== 'localhost') {
         $this->default['hostname'] = '127.0.0.1';  // safer than localhost on Linux
-        $this->default['username'] = 'u776838216_jharajeev';
-        $this->default['password'] = 'Rajeev@1990#123';
-        $this->default['database'] = 'u776838216_kennect22';
+        $this->default['username'] = 'rajeev_konnect';
+        $this->default['password'] = 'XXJIis@S=-&d{dR?';
+        $this->default['database'] = 'rajeev_konnect22';
     }
 }
 }

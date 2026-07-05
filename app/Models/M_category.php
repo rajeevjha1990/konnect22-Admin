@@ -15,7 +15,7 @@ class M_category extends Model
         'name',
         'image_url',
         'status',
-        'created_at',
+        'created',
     ];
 
     public function get_categories()
@@ -30,7 +30,7 @@ class M_category extends Model
 
     public function saveCategory($data)
     {
-        $data['created_at'] = date('Y-m-d H:i:s');
+        $data['created'] = date('Y-m-d H:i:s');
 
         return $this->insert($data);
     }

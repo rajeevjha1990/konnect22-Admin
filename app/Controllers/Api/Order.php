@@ -19,10 +19,8 @@ class Order extends BaseAuthController
 public function place_order()
 {
     $this->validation->setRules([
-        'customer_name'  => 'required',
         'mobile'         => 'required',
         'address'        => 'required',
-        'city'           => 'required',
         'pincode'        => 'required',
         'payment_method' => 'required',
         'total_amount'   => 'required',
@@ -45,13 +43,9 @@ public function place_order()
 
         'user_id' => $this->userData->user_id,
 
-        'order_name' => $this->request->getVar('customer_name'),
-
         'order_number' => $this->request->getVar('mobile'),
 
         'order_address' => $this->request->getVar('address'),
-
-        'order_city' => $this->request->getVar('city'),
 
         'order_pincode' => $this->request->getVar('pincode'),
 

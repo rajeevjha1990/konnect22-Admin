@@ -1,3 +1,16 @@
+<?php
+
+$statuses = [
+    'Pending',
+    'Confirmed',
+    'Processing',
+    'Shipped',
+    'Delivered',
+    'Cancelled'
+];
+
+?>
+
 <div class="content">
 
     <h2>Orders</h2>
@@ -8,7 +21,7 @@
         <tr>
             <th>ID</th>
             <th>Order No</th>
-            <th>Customer</th>
+            <th>Order By</th>
             <th>Mobile</th>
             <th>Total</th>
             <th>Payment</th>
@@ -31,14 +44,13 @@
 
             <td><?= $row['order_no']; ?></td>
 
-            <td><?= $row['order_name']; ?></td>
+            <td><?= $row['user_name']; ?></td>
 
             <td><?= $row['order_number']; ?></td>
 
             <td>₹<?= $row['total']; ?></td>
 
-            <td><?= $row['payment_mode']; ?></td>
-
+            <td><?= strtoupper($row['payment_mode']); ?></td>
             <td>
 
                 <?php if($row['status']=='Pending'){ ?>
@@ -83,36 +95,20 @@
     <form action="<?= base_url('order/status/'.$row['id']); ?>"
           method="post">
 
-        <select name="status"
-                onchange="this.form.submit()">
+        <select name="status" onchange="this.form.submit()">
 
-            <option value="Pending"
-                <?= $row['status']=='Pending'?'selected':'' ?>>
-                Pending
-            </option>
+    <?php foreach($statuses as $status){ ?>
 
-            <option value="Processing"
-                <?= $row['status']=='Processing'?'selected':'' ?>>
-                Processing
-            </option>
+        <option value="<?= $status ?>"
+            <?= $row['status'] == $status ? 'selected' : '' ?>>
 
-            <option value="Shipped"
-                <?= $row['status']=='Shipped'?'selected':'' ?>>
-                Shipped
-            </option>
+            <?= $status ?>
 
-            <option value="Delivered"
-                <?= $row['status']=='Delivered'?'selected':'' ?>>
-                Delivered
-            </option>
+        </option>
 
-            <option value="Cancelled"
-                <?= $row['status']=='Cancelled'?'selected':'' ?>>
-                Cancelled
-            </option>
+    <?php } ?>
 
-        </select>
-
+</select>
     </form>
 
 </td>

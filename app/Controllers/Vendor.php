@@ -18,6 +18,7 @@ class Vendor extends BaseController
         $this->validation  = \Config\Services::validation();
         $this->request     = \Config\Services::request();
         $this->vendorModel = new M_vendor();
+
     }
 
     /*
@@ -59,9 +60,10 @@ class Vendor extends BaseController
         }
 
         $this->setCommonData();
+    $categoryModel = new \App\Models\M_category();
 
-        $this->data['vendors'] = $this->vendorModel->getVendors();
-
+ $this->data['vendors'] =
+            $this->vendorModel->getVendors();
         echo view('includes/header', $this->data);
         echo view('includes/sidebar', $this->data);
         echo view('vendors', $this->data);
@@ -80,7 +82,10 @@ class Vendor extends BaseController
         }
 
         $this->setCommonData();
+       
+            $categoryModel = new \App\Models\M_category();
 
+        $this->data['categories'] =  $categoryModel->get_categories();
         echo view('includes/header', $this->data);
         echo view('includes/sidebar', $this->data);
         echo view('new_vendor', $this->data);
@@ -118,10 +123,7 @@ public function save()
             'rules' => 'required|valid_email'
         ],
 
-        'status' => [
-            'label' => 'Status',
-            'rules' => 'required'
-        ]
+        
     ];
 
     if (!$this->validate($rules)) {
@@ -135,13 +137,13 @@ public function save()
     $data = [
 
         'vendor_code' => $this->generateVendorCode(),
+        'category_id'   => trim($this->request->getPost('category_id')),
         'shop_name'   => trim($this->request->getPost('shop_name')),
         'owner_name'  => trim($this->request->getPost('owner_name')),
         'mobile'      => trim($this->request->getPost('mobile')),
         'email'       => trim($this->request->getPost('email')),
         'address'     => trim($this->request->getPost('address')),
         'gst_no'      => trim($this->request->getPost('gst_no')),
-        'status'      => $this->request->getPost('status') ?: 'Active',
     ];
 
     // Unique validation
@@ -224,7 +226,9 @@ public function save()
         }
 
         $this->setCommonData();
+        $categoryModel = new \App\Models\M_category();
 
+        $this->data['categories'] =  $categoryModel->get_categories();
         $this->data['vendor'] = $this->vendorModel->getVendor($id);
 
         echo view('includes/header', $this->data);
@@ -298,4 +302,14 @@ public function save()
         echo view('vendor', $this->data);
         echo view('includes/footer');
     }
+    public function getByCategory($categoryId)
+    {
+        $vendors = $this->vendorModel
+                        ->where('category_id', $categoryId)
+                        ->orderBy('owner_name', 'ASC')
+                        ->findAll();
+
+        return $this->response->setJSON($vendors);
+    }
 }
+?>

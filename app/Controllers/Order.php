@@ -24,23 +24,24 @@ class Order extends BaseController
         ];
     }
 
-    public function index()
-    {
-        if (!$this->session->get('logged_in')) {
-            return redirect()->to('/');
-        }
-
-        $this->setCommonData();
-
-        $this->data['orders'] = $this->orderModel
-            ->orderBy('id', 'DESC')
-            ->findAll();
-
-        echo view('includes/header', $this->data);
-        echo view('includes/sidebar', $this->data);
-        echo view('order_view', $this->data);
-        echo view('includes/footer');
+public function index()
+{
+    if (!$this->session->get('logged_in')) {
+        return redirect()->to('/');
     }
+
+    $this->setCommonData();
+
+    $this->data['orders'] = $this->orderModel
+        ->select('orders.*, user.user_name as user_name')
+        ->join('user', 'user.user_id = orders.user_id', 'left')
+        ->orderBy('orders.id', 'DESC')
+        ->findAll();
+    echo view('includes/header', $this->data);
+    echo view('includes/sidebar', $this->data);
+    echo view('order_view', $this->data);
+    echo view('includes/footer');
+}
 public function details($id)
 {
      if (!$this->session->get('logged_in')) {

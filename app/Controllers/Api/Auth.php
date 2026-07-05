@@ -348,11 +348,6 @@ public function get_profile()
           'user_name'=>$this->request->getVar('user_name'),
           'user_mobile'=>$this->request->getVar('mobile'),
           'user_email'=>$this->request->getVar('user_email'),
-          'user_pincode'=>$this->request->getVar('pincode'),
-          'user_state'=>$this->request->getVar('state_id'),
-          'user_district'=>$this->request->getVar('district_id'),
-          'user_block'=>$this->request->getVar('block_id'),
-          'user_village'=>$this->request->getVar('village'),
          
       );
       $userModel = new \App\Models\M_user();
@@ -370,6 +365,99 @@ public function get_profile()
           ]);
       }
     }
+public function save_address()
+{
+    $this->validation->setRules([
+        'mobile'   => 'required|numeric|min_length[10]',
+        'pincode'  => 'required|min_length[6]',
+        'address'  => 'required',
+        'landmark' => 'required'
+    ]);
 
+    if (!$this->validation->withRequest($this->request)->run()) {
+        return $this->response->setStatusCode(400)->setJSON([
+            'status' => false,
+            'errors' => $this->validation->getErrors()
+        ]);
+    }
+
+    $m_address = new \App\Models\M_address();
+
+    $addressdata = [
+        'type'      => $this->request->getPost('type'),
+        'mobile'    => $this->request->getPost('mobile'),
+        'address'   => $this->request->getPost('address'),
+        'landmark'  => $this->request->getPost('landmark'),
+        'pincode'   => $this->request->getPost('pincode'),
+    ];
+
+    $id = $this->request->getPost('id');
+
+    if (!empty($id)) {
+
+        // UPDATE
+        $result = $m_address
+            ->where('id', $id)
+            ->where('user_id', $this->userData->user_id)
+            ->set($addressdata)
+            ->update();
+
+        $message = 'Address updated successfully.';
+
+    } else {
+
+        // INSERT
+        $addressdata['user_id'] = $this->userData->user_id;
+
+        $result = $m_address->insert_address($addressdata);
+
+        $message = 'Address saved successfully.';
+    }
+
+    if ($result) {
+        return $this->response->setStatusCode(200)->setJSON([
+            'status' => true,
+            'msg'    => $message
+        ]);
+    }
+
+    return $this->response->setStatusCode(500)->setJSON([
+        'status' => false,
+        'msg'    => 'Operation failed!'
+    ]);
+}
+    public function getAddresses()
+        {
+            $m_address = new \App\Models\M_address();
+            $user_id = $this->userData->user_id;
+
+        return $this->response->setJSON([
+            'status'   => true,
+            'addresses' => $m_address->getaddresses($user_id)
+        ]);
+    }
+public function get_address()
+    {
+         $m_address = new \App\Models\M_address();
+            $user_id = $this->userData->user_id;
+            $addressid=$this->request->getPost('addressId');
+        return $this->response->setJSON([
+            'status'   => true,
+            'address' => $m_address->getaddress($addressid)
+        ]);
+    }
+public function delete_address()
+    {
+        $addressid=$this->request->getPost('addressId');
+        $m_address = new \App\Models\M_address();
+        $result=$m_address->delete_address($addressid);
+        $message = 'Address removed successfully.';
+        if ($result) {
+        return $this->response->setStatusCode(200)->setJSON([
+            'status' => true,
+            'msg'    => $message
+        ]);
+    }
+    }
 }
 ?>

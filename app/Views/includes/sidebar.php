@@ -8,11 +8,7 @@
       </a>
     </li>
 
-    <li>
-      <a href="<?= base_url('vendor'); ?>">
-        <i class="fas fa-users"></i> Vendors
-      </a>
-    </li>  
+   
     <li>
           <a href="<?= base_url('banner'); ?>">
             <i class="fas fa-list-alt"></i> Banners
@@ -23,6 +19,11 @@
             <i class="fas fa-list-alt"></i> Categories
           </a>
         </li>
+        <li>
+        <a href="<?= base_url('vendor'); ?>">
+          <i class="fas fa-users"></i> Vendors
+        </a>
+      </li>  
         <li>
           <a href="<?= base_url('product'); ?>">
             <i class="fas fa-list-alt"></i> Products

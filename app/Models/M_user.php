@@ -16,11 +16,6 @@ class M_user extends Model
         'user_otp',
         'otp_verified',
         'user_password',
-        'user_pincode',
-        'user_state',
-        'user_district',
-        'user_block',
-        'user_village',
         'user_status',
         'user_created',
     ];

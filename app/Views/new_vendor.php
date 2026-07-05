@@ -103,7 +103,7 @@ if(isset($vendor)){
     $email       = $vendor->email ?? '';
     $address     = $vendor->address ?? '';
     $gst_no      = $vendor->gst_no ?? '';
-    $status      = $vendor->status ?? 'Active';
+    $category_id=$vendor->category_id;
 
 }else{
 
@@ -115,7 +115,7 @@ if(isset($vendor)){
     $email       = '';
     $address     = '';
     $gst_no      = '';
-    $status      = 'Active';
+    $category_id='';
 }
 ?>
 
@@ -139,8 +139,28 @@ if(isset($vendor)){
 
             <input type="hidden" name="id" value="<?= esc($vendor_id) ?>">
 
-            <div class="grid">
+                <div class="grid">
+                <div class="form-group">
+            <label>Category *</label>
 
+            <select name="category_id" required>
+
+                <option value="">Select Category</option>
+
+                <?php foreach($categories as $category){ ?>
+
+                    <option value="<?= $category['id'] ?>"
+                        <?= $category_id == $category['id'] ? 'selected' : '' ?>>
+
+                        <?= $category['name'] ?>
+
+                    </option>
+
+                <?php } ?>
+
+            </select>
+
+        </div>
                 <div class="form-group">
                     <label>Shop Name *</label>
                     <input type="text"
@@ -178,24 +198,6 @@ if(isset($vendor)){
                            name="gst_no"
                            value="<?= esc($gst_no) ?>">
                 </div>
-
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="status">
-
-                        <option value="Active"
-                            <?= $status=='Active'?'selected':'' ?>>
-                            Active
-                        </option>
-
-                        <option value="Inactive"
-                            <?= $status=='Inactive'?'selected':'' ?>>
-                            Inactive
-                        </option>
-
-                    </select>
-                </div>
-
                 <div class="form-group full">
                     <label>Address</label>
                     <textarea name="address" rows="4"><?= esc($address) ?></textarea>

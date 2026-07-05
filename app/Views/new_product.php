@@ -157,51 +157,56 @@ if(isset($product)){
            value="<?= esc($id) ?>">
 
     <div class="grid">
+<div class="form-group">
+    <label>Category *</label>
 
+    <select name="category_id"
+            id="category_id"
+            required>
+
+        <option value="">Select Category</option>
+
+        <?php foreach($categories as $category){ ?>
+
+            <option value="<?= $category['id'] ?>"
+                <?= $category_id == $category['id'] ? 'selected' : '' ?>>
+
+                <?= esc($category['name']) ?>
+
+            </option>
+
+        <?php } ?>
+
+    </select>
+</div>
         <div class="form-group">
-            <label>Vendor *</label>
+    <label>Vendor *</label>
 
-            <select name="vendor_id" required>
+    <select name="vendor_id"
+            id="vendor_id"
+            required>
 
-                <option value="">Select Vendor</option>
+        <option value="">Select Vendor</option>
 
-                <?php foreach($vendors as $vendor){ ?>
+        <?php if(!empty($vendors)){ ?>
 
-                    <option value="<?= $vendor->id ?>"
-                        <?= $vendor_id == $vendor->id ? 'selected' : '' ?>>
+            <?php foreach($vendors as $vendor){ ?>
 
-                        <?= $vendor->owner_name ?>
+                <option value="<?= $vendor->id ?>"
+                    <?= $vendor_id == $vendor->id ? 'selected' : '' ?>>
 
-                    </option>
+                    <?= esc($vendor->owner_name) ?>
 
-                <?php } ?>
+                </option>
 
-            </select>
+            <?php } ?>
 
-        </div>
+        <?php } ?>
 
-        <div class="form-group">
-            <label>Category *</label>
+    </select>
+</div>
 
-            <select name="category_id" required>
-
-                <option value="">Select Category</option>
-
-                <?php foreach($categories as $category){ ?>
-
-                    <option value="<?= $category['id'] ?>"
-                        <?= $category_id == $category['id'] ? 'selected' : '' ?>>
-
-                        <?= $category['name'] ?>
-
-                    </option>
-
-                <?php } ?>
-
-            </select>
-
-        </div>
-
+        
         <div class="form-group full">
 
             <label>Product Name *</label>
@@ -329,3 +334,61 @@ if(isset($product)){
     </div>
 
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+
+$(function(){
+
+    $('#category_id').change(function(){
+
+        let categoryId = $(this).val();
+
+        if(categoryId == '')
+        {
+            $('#vendor_id').html(
+                '<option value="">Select Vendor</option>'
+            );
+
+            return;
+        }
+
+        $.ajax({
+
+            url : '<?= base_url("vendor/getByCategory") ?>/' + categoryId,
+
+            type : 'GET',
+
+            dataType : 'json',
+
+            success : function(response){
+
+                let html =
+                    '<option value="">Select Vendor</option>';
+
+                $.each(response, function(i, vendor){
+
+                    html +=
+                        '<option value="'+vendor.id+'">'+
+                        vendor.owner_name+
+                        '</option>';
+
+                });
+
+                $('#vendor_id').html(html);
+            },
+
+            error : function(){
+
+                $('#vendor_id').html(
+                    '<option value="">No Vendor Found</option>'
+                );
+
+            }
+
+        });
+
+    });
+
+});
+</script>

@@ -71,64 +71,69 @@ class Product extends BaseController
     }
 
     public function save()
-    {
-        $id = $this->request->getPost('id');
+{
+    $id = $this->request->getPost('id');
 
-        $image = '';
+    $image = '';
 
-        if (!empty($_FILES['image']['name'])) {
+    if (!empty($_FILES['image']['name'])) {
 
-            $file = $this->request->getFile('image');
+        $file = $this->request->getFile('image');
 
-            if ($file->isValid()) {
+        if ($file->isValid() && !$file->hasMoved()) {
 
-                $image = time().'_'.$file->getRandomName();
+            $image = time() . '_' . $file->getRandomName();
 
-                $file->move(
-                    ROOTPATH.'public/uploads/products/',
-                    $image
-                );
-            }
+            $uploadPath = ROOTPATH . 'public/uploads/products/';
+
+            // Upload original image
+            $file->move($uploadPath, $image);
+
+            // Resize (Aspect Ratio Maintain)
+            \Config\Services::image()
+                ->withFile($uploadPath . $image)
+                ->resize(
+                    1000,     // Max Width
+                    1000,     // Max Height
+                    true,     // Maintain Aspect Ratio
+                    'auto'
+                )
+                ->save($uploadPath . $image, 90);
         }
-
-        $data = [
-
-            'vendor_id'      => $this->request->getPost('vendor_id'),
-            'category_id'    => $this->request->getPost('category_id'),
-            'name'           => $this->request->getPost('product_name'),
-            'description'    => $this->request->getPost('description'),
-            'price'          => $this->request->getPost('price'),
-            'mrp'            => $this->request->getPost('sale_price'),
-            'stock_quantity' => $this->request->getPost('stock'),
-            'status'         => $this->request->getPost('status'),
-        ];
-
-        if (!empty($image)) {
-            $data['image_webp'] = $image;
-        }
-
-        if (empty($id)) {
-
-            $resp = $this->productModel->saveProduct($data);
-
-            $msg = "Product added successfully";
-
-        } else {
-
-            $resp = $this->productModel->updateProduct(
-                $id,
-                $data
-            );
-
-            $msg = "Product updated successfully";
-        }
-
-        return $this->response->setJSON([
-            'status'   => $resp ? true : false,
-            'message'  => $msg,
-            'redirect' => base_url('product')
-        ]);
     }
+
+    $data = [
+        'vendor_id'      => $this->request->getPost('vendor_id'),
+        'category_id'    => $this->request->getPost('category_id'),
+        'name'           => $this->request->getPost('product_name'),
+        'description'    => $this->request->getPost('description'),
+        'price'          => $this->request->getPost('price'),
+        'mrp'            => $this->request->getPost('sale_price'),
+        'stock_quantity' => $this->request->getPost('stock'),
+        'status'         => $this->request->getPost('status'),
+    ];
+
+    if (!empty($image)) {
+        $data['image_webp'] = $image;
+    }
+
+    if (empty($id)) {
+
+        $resp = $this->productModel->saveProduct($data);
+        $msg  = 'Product added successfully';
+
+    } else {
+
+        $resp = $this->productModel->updateProduct($id, $data);
+        $msg  = 'Product updated successfully';
+    }
+
+    return $this->response->setJSON([
+        'status'   => (bool) $resp,
+        'message'  => $msg,
+        'redirect' => base_url('product')
+    ]);
+}
 
     public function edit($id)
     {
